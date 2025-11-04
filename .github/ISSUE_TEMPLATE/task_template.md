@@ -2,7 +2,8 @@
 name: 📋 Task
 about: 개발 또는 디자인 작업을 등록합니다.
 title: "[Task] "
-labels: [task]
+labels: ''
+assignees: ''
 
 ---
 
