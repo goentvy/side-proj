@@ -1,0 +1,46 @@
+# Node.js (React + Vite)
+node_modules/
+dist/
+.env
+.env.local
+.vscode/
+.DS_Store
+
+# Tailwind JIT
+tailwind.config.js
+postcss.config.js
+
+# TypeScript
+*.tsbuildinfo
+
+# Spring Boot (Java)
+target/
+*.log
+*.class
+*.jar
+*.war
+*.iml
+.idea/
+.gradle/
+build/
+out/
+
+# MariaDB
+*.sql
+*.db
+
+# OS / Editor
+*.swp
+*.swo
+*.bak
+*.tmp
+Thumbs.db
+desktop.ini
+
+# Docker
+docker-compose.override.yml
+*.pid
+
+# Test / Coverage
+coverage/
+test-output/
