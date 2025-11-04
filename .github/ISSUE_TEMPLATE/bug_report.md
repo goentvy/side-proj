@@ -1,7 +1,6 @@
 ---
-
 name: 🐞 Bug Report
-description: 시스템에서 발생한 버그를 보고합니다.
+about: 시스템에서 발생한 버그를 보고합니다.
 title: "[Bug] "
 labels: [bug]
 

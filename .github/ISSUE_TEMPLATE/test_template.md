@@ -1,7 +1,6 @@
 ---
-
 name: 🧪 테스트용 템플릿
-description: 이 템플릿은 GitHub 이슈 템플릿 UI 확인을 위한 테스트입니다.
+about: 이 템플릿은 GitHub 이슈 템플릿 UI 확인을 위한 테스트입니다.
 title: "[Test] "
 labels: [test]
 ---
