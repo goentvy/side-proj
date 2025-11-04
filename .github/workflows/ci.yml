@@ -44,5 +44,8 @@ jobs:
           distribution: 'temurin'
           java-version: 21
 
+      - name: Grant execute permission to Gradle
+        run: chmod +x ./gradlew
+
       - name: Build Spring Boot project
         run: ./gradlew build
