@@ -25,6 +25,7 @@ public class User {
     private String role; // 예: "admin", "user", "partner"
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean active = true;
 
     // 추가 예정 필드
