@@ -1,4 +1,4 @@
-package com.entvy.openbidhub.entity;
+package com.entvy.openbidhub.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
