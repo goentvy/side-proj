@@ -1,34 +1,72 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import { Routes, Route } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { ThemeProvider } from './components/theme-provider'
+import { ModeToggle } from './components/mode-toggle'
+import { Toaster } from 'react-hot-toast'
+import { SecureRoute } from './routes'
+
+// 페이지 컴포넌트
+import Home from './pages/Home'
+import Login from './pages/Login'
+import NotFound from './pages/NotFound'
+
+// 대시보드
+import UserDashboard from './pages/user/UserDashboard'
+import AdminDashboard from './pages/admin/AdminDashboard'
+import PartnerDashboard from './pages/partner/PartnerDashboard'
+import UnauthorizedPage from './pages/UnauthorizedPage'
+
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loggedIn, setLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setLoggedIn(!!token);
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Toaster position="top-center" />
+      <div className="bg-background text-foreground min-h-screen">
+        <ModeToggle />
+
+        <Routes>
+          {/* 공통 */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/unauthorized" element={<UnauthorizedPage />} />
+          <Route path="*" element={<NotFound />} />
+
+          {/* 대시보드 */}
+          <Route 
+            path="/user/dashboard" 
+            element={
+              <SecureRoute allowedRoles={['USER']}>
+                {(user) => <UserDashboard user={user}/>}
+              </SecureRoute>
+            }
+          />
+          <Route 
+            path="/admin/dashboard" 
+            element={
+              <SecureRoute allowedRoles={['ADMIN']}>
+                {(user) => <AdminDashboard user={user}/>}
+              </SecureRoute>
+            }
+          />
+          <Route 
+            path="/partner/dashboard" 
+            element={
+              <SecureRoute allowedRoles={['PARTNER']}>
+                {(user) => <PartnerDashboard user={user}/>}
+              </SecureRoute>
+            }
+          />
+        </Routes>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    </ThemeProvider>
   )
 }
 

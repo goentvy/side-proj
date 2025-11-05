@@ -8,6 +8,13 @@
     "module": "ESNext",
     "types": ["vite/client"],
     "skipLibCheck": true,
+    /* Tailwindcss */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
