@@ -40,3 +40,7 @@ logging:
   level:
     root: INFO
     org.springframework.web: DEBUG
+
+onbid:
+  api:
+    service-key: dummy-key-for-test
