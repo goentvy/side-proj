@@ -1,13 +1,11 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
-import { useEffect, useState } from 'react'
 import { ThemeProvider } from './components/theme-provider'
 import { ModeToggle } from './components/mode-toggle'
 import { Toaster } from 'react-hot-toast'
 import { SecureRoute } from './routes'
 
 // 페이지 컴포넌트
-import Home from './pages/Home'
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 
@@ -16,16 +14,10 @@ import UserDashboard from './pages/user/UserDashboard'
 import AdminDashboard from './pages/admin/AdminDashboard'
 import PartnerDashboard from './pages/partner/PartnerDashboard'
 import UnauthorizedPage from './pages/UnauthorizedPage'
+import SearchPage from './pages/search/SearchPage'
 
 
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    setLoggedIn(!!token);
-  }, []);
-
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Toaster position="top-center" />
@@ -34,7 +26,7 @@ function App() {
 
         <Routes>
           {/* 공통 */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<SearchPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="*" element={<NotFound />} />

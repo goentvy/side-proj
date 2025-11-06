@@ -1,5 +1,6 @@
 export { Input } from './input'
 export { Button, buttonVariants } from './button'
+export { Badge, badgeVariants } from './badge'
 export {
   Card,
   CardHeader,
@@ -26,3 +27,16 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
 } from './dropdown-menu'
+
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from './select'
