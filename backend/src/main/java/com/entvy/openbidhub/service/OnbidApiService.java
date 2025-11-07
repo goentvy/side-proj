@@ -19,6 +19,17 @@ public class OnbidApiService {
     @Value("${onbid.api.service-key}")
     private String serviceKey;
 
+//    @PostConstruct
+//    public void init() {
+//        try {
+//            System.out.println("Injected serviceKey = " + serviceKey);
+//            System.out.println("System.getenv = " + System.getenv("ONBID_SERVICE_KEY"));
+//            System.out.println("restTemplate = " + restTemplate);
+//        } catch (Exception e) {
+//            System.out.println("❌ PostConstruct failed: " + e.getMessage());
+//        }
+//    }
+
     public String fetchRawData() {
         URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
 

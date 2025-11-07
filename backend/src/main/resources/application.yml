@@ -49,5 +49,5 @@ onbid:
   api:
     service-key: ${ONBID_SERVICE_KEY}
 
-env:
-  ONBID_SERVICE_KEY: ${{ secrets.ONBID_SERVICE_KEY }}
+#env:
+#  ONBID_SERVICE_KEY: ${{ secrets.ONBID_SERVICE_KEY }}
