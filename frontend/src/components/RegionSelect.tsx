@@ -10,6 +10,7 @@ interface Props {
 const RegionSelect = ({ form, setForm }: Props) => {
   const selectedSido = regions.find(r => r.sido === form.sido);
   const selectedSigungu = selectedSido?.sigungu.find(s => s.name === form.sgk);
+  const uniqueSidoList = Array.from(new Set(regions.map(r => r.sido)));
 
   return (
     <div className="grid gap-4">
@@ -18,8 +19,8 @@ const RegionSelect = ({ form, setForm }: Props) => {
       }}>
         <SelectTrigger><SelectValue placeholder="시도 선택" /></SelectTrigger>
         <SelectContent>
-          {regions.map(r => (
-            <SelectItem key={r.sido} value={r.sido}>{r.sido}</SelectItem>
+          {uniqueSidoList.map(sido => (
+            <SelectItem key={sido} value={sido}>{sido}</SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -29,8 +30,8 @@ const RegionSelect = ({ form, setForm }: Props) => {
       }} disabled={!form.sido}>
         <SelectTrigger><SelectValue placeholder="시군구 선택" /></SelectTrigger>
         <SelectContent>
-          {selectedSido?.sigungu.map(s => (
-            <SelectItem key={s.name} value={s.name}>{s.name}</SelectItem>
+          {Array.from(new Set(selectedSido?.sigungu.map(s => s.name))).map(name => (
+            <SelectItem key={name} value={name}>{name}</SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -40,7 +41,7 @@ const RegionSelect = ({ form, setForm }: Props) => {
       }} disabled={!form.sgk}>
         <SelectTrigger><SelectValue placeholder="읍면동 선택" /></SelectTrigger>
         <SelectContent>
-          {selectedSigungu?.eupmyeon.map(e => (
+          {Array.from(new Set(selectedSigungu?.eupmyeon)).map(e => (
             <SelectItem key={e} value={e}>{e}</SelectItem>
           ))}
         </SelectContent>
