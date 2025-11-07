@@ -1,11 +1,15 @@
 package com.entvy.openbidhub.dto;
 
 import com.entvy.openbidhub.domain.OnbidItemEntity;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@JsonDeserialize(builder = OnbidItemResponse.OnbidItemResponseBuilder.class)
 public class OnbidItemResponse {
     private String cltrMnmtNo;     // 관리번호
     private String cltrNm;         // 물건명
@@ -31,5 +35,9 @@ public class OnbidItemResponse {
                 .pbctClsDt(entity.getPbctClsDt())
                 .bidStatus(entity.getBidStatus())
                 .build();
+    }
+
+    @JsonPOJOBuilder(withPrefix = "")
+    public static class OnbidItemResponseBuilder {
     }
 }
