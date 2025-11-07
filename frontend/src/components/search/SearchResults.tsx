@@ -1,30 +1,56 @@
-import { useSearchItems } from "@/hook/useSearchItems";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import Pagination from "../Pagination";
 import AuctionCard from "../AuctionCard";
 import LoadingSpinner from "../LoadingSpinner";
-import type { OnbidItemSearchCondition } from "@/types";
+import type { OnbidItemResponse, OnbidItemSearchCondition } from "@/types";
 
 interface Props {
-    cond: OnbidItemSearchCondition;
+  cond: OnbidItemSearchCondition;
 }
 
 const SearchResults = ({ cond }: Props) => {
+  const [items, setItems] = useState<OnbidItemResponse[]>([]);
   const [page, setPage] = useState(0);
-  const { data, isLoading } = useSearchItems(cond, page);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      setIsLoading(true);
+
+      try {
+        const { data } = await axios.post("/api/onbid/items/search", cond, {
+          params: {
+            page: page,
+            size: 10,
+          },
+        });
+
+        setItems(data.content);
+        setTotalPages(data.totalPages);
+      } catch (error) {
+        console.error("API Error:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchItems();
+  }, [cond, page]);
 
   if (isLoading) return <LoadingSpinner />;
 
   return (
     <>
-      {data?.content.map(item => (
+      {items.map(item => (
         <AuctionCard key={item.cltrMnmtNo} {...item} />
       ))}
-      {data && (
+      {items.length > 0 && (
         <Pagination
-            currentPage={data.page}
-            totalPages={data.totalPages}
-            onPageChange={setPage}
+          currentPage={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
         />
       )}
     </>
