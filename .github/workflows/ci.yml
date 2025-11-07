@@ -49,3 +49,72 @@ jobs:
 
       - name: Build Spring Boot project
         run: ./gradlew build
+
+  notify-slack:
+    name: Notify Slack
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [build-frontend, build-backend]
+    steps:
+      - name: Set CI status
+        id: set-status
+        run: |
+          STATUS="✅ 빌드 성공"
+          FAILURES=""
+          
+          if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
+            FAILURES="${FAILURES}❌ Frontend 빌드 실패\n"
+          fi
+          
+          if [[ "${{ needs.build-backend.result }}" != "success" ]]; then
+            FAILURES="${FAILURES}❌ Backend 빌드 실패\n"
+          fi
+          
+          if [[ "$FAILURES" != "" ]]; then
+            STATUS="⚠️ 일부 실패\n${FAILURES}"
+          fi
+          
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+
+      - name: Send Slack notification
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "text": "*🔔 CI 알림*\n\n*브랜치:* `${{ github.ref_name }}`\n*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n*상태:* `${{ steps.set-status.outputs.status }}`\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "username": "GitHub Actions",
+              "icon_emoji": ":robot_face:"
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  
+  create-issue-on-failure:
+    name: Create Issue on Failure
+    runs-on: ubuntu-latest
+    if: failure()
+    needs: [build-frontend, build-backend]
+    steps:
+      - name: Install GitHub CLI
+        run: sudo apt install gh
+
+      - name: Authenticate GitHub CLI
+        run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Determine failed jobs
+        id: set-failure
+        run: |
+          FAILURES=""
+          if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
+            FAILURES="${FAILURES}- ❌ Frontend 빌드 실패\n"
+          fi
+          if [[ "${{ needs.build-backend.result }}" != "success" ]]; then
+            FAILURES="${FAILURES}- ❌ Backend 빌드 실패\n"
+          fi
+          echo "failures=$FAILURES" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Issue
+        run: |
+          gh issue create \
+            --title "❌ CI 실패: `${{ github.ref_name }}` 브랜치" \
+            --body "*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n\n*실패 항목:*\n${{ steps.set-failure.outputs.failures }}\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
+            --label "ci-failure"
