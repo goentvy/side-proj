@@ -6,10 +6,11 @@ import LoadingSpinner from "../LoadingSpinner";
 import type { OnbidItemResponse, OnbidItemSearchCondition } from "@/types";
 
 interface Props {
-  cond: OnbidItemSearchCondition;
+  cond: OnbidItemSearchCondition | null;
+  lists: OnbidItemResponse[]; 
 }
 
-const SearchResults = ({ cond }: Props) => {
+const SearchResults = ({ cond, lists }: Props) => {
   const [items, setItems] = useState<OnbidItemResponse[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,9 +44,14 @@ const SearchResults = ({ cond }: Props) => {
 
   return (
     <>
-      {items.map(item => (
+      {items.length > 0 ? items.map(item => (
         <AuctionCard key={item.cltrMnmtNo} {...item} />
+      )) : lists.map((list, index) => (
+        <AuctionCard key={`${list.cltrMnmtNo}-${index}`} {...list} />
       ))}
+      {(cond && items.length === 0) && (
+        <div className="text-center text-gray-500 mt-4">검색 결과가 없습니다.</div>
+      )}
       {items.length > 0 && (
         <Pagination
           currentPage={page}

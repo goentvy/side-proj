@@ -20,8 +20,10 @@ export default function Login() {
       }).catch(() => {
         navigate('/login');
       });
+    } else {
+      navigate('/login');
     }
-  }, []);
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +45,7 @@ export default function Login() {
       }, 0);
     } catch (err) {
       toast.error('로그인 실패');
+      console.error("로그인 실패: " + err);
     }
   };
 

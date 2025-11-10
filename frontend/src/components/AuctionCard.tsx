@@ -2,11 +2,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui";
 import type { OnbidItemResponse } from "@/types";
 
-const formatCurrency = (value: number) =>
-  value.toLocaleString("ko-KR", { style: "currency", currency: "KRW" });
+function formatCurrency(value: number | null | undefined) {
+  if (value == null) return "-"; // 또는 "정보 없음"
+  return value.toLocaleString();
+}
 
-const formatDate = (yyyymmdd: string) =>
-  `${yyyymmdd.slice(0, 4)}-${yyyymmdd.slice(4, 6)}-${yyyymmdd.slice(6, 8)}`;
+function formatDate(date: string | null | undefined) {
+  if (!date) return "-"; // 또는 "날짜 없음"
+  return date.slice(0, 10);
+}
 
 const AuctionCard = ({
   cltrMnmtNo,
