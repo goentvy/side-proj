@@ -30,6 +30,18 @@ public class OnbidApiService {
 //        }
 //    }
 
+    // 공공API 호출(서울특별시 기준)
+    public String fetchRawXml() {
+        URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
+
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("numOfRows", "100")
+                .queryParam("pageNo", "1");
+
+        return restTemplate.getForObject(builder.toUriString(), String.class);
+    }
+
     public String fetchRawData() {
         URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
 
@@ -41,17 +53,17 @@ public class OnbidApiService {
                 .queryParam("DPSL_MTD_CD", "0001")
                 .queryParam("CTGR_HIRK_ID", "10000")
                 .queryParam("CTGR_HIRK_ID_MID", "10100")
-                .queryParam("SIDO", "강원도")
-                .queryParam("SGK", "인제군")
-                .queryParam("EMD", "남면")
-                .queryParam("GOODS_PRICE_FROM", "522740000")
-                .queryParam("GOODS_PRICE_TO", "617393000")
-                .queryParam("OPEN_PRICE_FROM", "522740000")
-                .queryParam("OPEN_PRICE_TO", "617393000")
-                .queryParam("CLTR_NM", "종이팩")
-                .queryParam("PBCT_BEGN_DTM", "20171218")
-                .queryParam("PBCT_CLS_DTM", "20171218")
-                .queryParam("CLTR_MNMT_NO", "2012-1141-001291");
+                .queryParam("SIDO", "서울특별시")
+                .queryParam("SGK", "")
+                .queryParam("EMD", "")
+                .queryParam("GOODS_PRICE_FROM", "")
+                .queryParam("GOODS_PRICE_TO", "")
+                .queryParam("OPEN_PRICE_FROM", "")
+                .queryParam("OPEN_PRICE_TO", "")
+                .queryParam("CLTR_NM", "")
+                .queryParam("PBCT_BEGN_DTM", "")
+                .queryParam("PBCT_CLS_DTM", "")
+                .queryParam("CLTR_MNMT_NO", "");
 
         ResponseEntity<String> response = restTemplate.getForEntity(builder.toUriString(), String.class);
         return response.getBody();
@@ -59,7 +71,6 @@ public class OnbidApiService {
 
     public String fetchPage(int pageNo, int numOfRows, String fromDate, String toDate) {
         URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
-        String serviceKey = "acf2ba0b6e27eb1ca9299a081a034a30c94d70848411fceb4c65cefa83ae7926";
 
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
                 .uri(uri)

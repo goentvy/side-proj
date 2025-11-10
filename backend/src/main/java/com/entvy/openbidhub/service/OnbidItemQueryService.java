@@ -1,9 +1,8 @@
 package com.entvy.openbidhub.service;
 
-import com.entvy.openbidhub.domain.OnbidItemEntity;
-import com.entvy.openbidhub.dto.OnbidItemResponse;
-import com.entvy.openbidhub.dto.OnbidItemSearchCondition;
-import com.entvy.openbidhub.dto.PageResponse;
+import com.entvy.openbidhub.dto.*;
+import com.entvy.openbidhub.mapper.AuctionCardMapper;
+import com.entvy.openbidhub.mapper.OnbidItemMapper;
 import com.entvy.openbidhub.repository.OnbidItemRepository;
 import com.entvy.openbidhub.repository.spec.OnbidItemSpecification;
 import lombok.RequiredArgsConstructor;
@@ -11,11 +10,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class OnbidItemQueryService {
 
     private final OnbidItemRepository repository;
+    private final OnbidItemMapper onbidItemMapper;
 
     // 전체 조회 (페이징 + DTO 변환)
     public PageResponse<OnbidItemResponse> getAll(Pageable pageable) {
@@ -29,5 +31,10 @@ public class OnbidItemQueryService {
         Page<OnbidItemResponse> page = repository.findAll(OnbidItemSpecification.withCondition(cond), pageable)
                 .map(OnbidItemResponse::from);
         return PageResponse.from(page);
+    }
+
+    // Mybatis
+    public List<OnbidItemDto> getLatestItems() {
+        return onbidItemMapper.findLatestItems();
     }
 }
