@@ -21,15 +21,9 @@ const SearchResults = ({ cond, lists }: Props) => {
       setIsLoading(true);
 
       try {
-        const { data } = await axios.post("/api/onbid/items/search", cond, {
-          params: {
-            page: page,
-            size: 10,
-          },
-        });
-
-        setItems(data.content);
-        setTotalPages(data.totalPages);
+        const { data } = await axios.get("/api/onbid/cards");
+        setItems(data);
+        setTotalPages(data.length);
       } catch (error) {
         console.error("API Error:", error);
       } finally {

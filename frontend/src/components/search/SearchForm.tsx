@@ -12,15 +12,15 @@ const initialForm: OnbidItemSearchCondition = {
   sgk: "",
   emd: "",
   cltrNm: "",
-  openPriceFrom: undefined,
-  openPriceTo: undefined,
-  goodsPriceFrom: undefined,
-  goodsPriceTo: undefined,
-  bidStatus: "",
-  pbctBegnDtFrom: "",
-  pbctBegnDtTo: "",
   cltrMnmtNo: "",
-};
+  pbctCltrStatNm: "",
+  minBidPrcFrom: undefined,
+  minBidPrcTo: undefined,
+  apslAsesAvgAmtFrom: undefined,
+  apslAsesAvgAmtTo: undefined,
+  pbctBegnDtmFrom: "",
+  pbctBegnDtmTo: ""
+}
 
 const SearchForm = ({ onSubmit }: Props) => {
   const [form, setForm] = useState<OnbidItemSearchCondition>(initialForm);
