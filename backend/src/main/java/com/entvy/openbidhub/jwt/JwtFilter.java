@@ -25,6 +25,17 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // 인증 없이 허용할 경로
+        if (path.startsWith("/api/login") ||
+                path.startsWith("/api/signup") ||
+                path.startsWith("/api/onbid") ||
+                path.startsWith("/api/auction-items/import")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String authHeader = request.getHeader("Authorization");
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -46,6 +57,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }
+        } else {
+            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Missing token");
+            return;
         }
 
         chain.doFilter(request, response);
