@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.AuctionSearchMapper">
+    <!-- 조건 검색 데이터 조회 -->
+    <select id="searchByCondition" parameterType="map" resultType="com.entvy.openbidhub.dto.AuctionCardDto">
+        SELECT
+        cltr_mnmt_no,
+        cltr_nm,
+        apsl_ases_avg_amt,
+        min_bid_prc,
+        pbct_begn_dtm,
+        pbct_cls_dtm,
+        pbct_cltr_stat_nm
+        FROM auction_items
+        WHERE 1=1
+        <if test="cond.cltrNm != null and cond.cltrNm != ''">
+            AND cltr_nm LIKE CONCAT('%', #{cond.cltrNm}, '%')
+        </if>
+        <if test="cond.cltrMnmtNo != null and cond.cltrMnmtNo != ''">
+            AND cltr_mnmt_no = #{cond.cltrMnmtNo}
+        </if>
+        <if test="cond.pbctCltrStatNm != null and cond.pbctCltrStatNm != ''">
+            AND pbct_cltr_stat_nm = #{cond.pbctCltrStatNm}
+        </if>
+        <if test="cond.minBidPrcFrom != null">
+            AND min_bid_prc &gt;= #{cond.minBidPrcFrom}
+        </if>
+        <if test="cond.minBidPrcTo != null">
+            AND min_bid_prc &lt;= #{cond.minBidPrcTo}
+        </if>
+        <if test="cond.apslAsesAvgAmtFrom != null">
+            AND apsl_ases_avg_amt &gt;= #{cond.apslAsesAvgAmtFrom}
+        </if>
+        <if test="cond.apslAsesAvgAmtTo != null">
+            AND apsl_ases_avg_amt &lt;= #{cond.apslAsesAvgAmtTo}
+        </if>
+        <if test="cond.pbctBegnDtmFrom != null and cond.pbctBegnDtmFrom != ''">
+            AND pbct_begn_dtm &gt;= #{cond.pbctBegnDtmFrom}
+        </if>
+        <if test="cond.pbctBegnDtmTo != null and cond.pbctBegnDtmTo != ''">
+            AND pbct_begn_dtm &lt;= #{cond.pbctBegnDtmTo}
+        </if>
+        ORDER BY pbct_begn_dtm DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 데이터 개수 조회 -->
+    <select id="countByCondition" parameterType="map" resultType="long">
+        SELECT COUNT(*)
+        FROM auction_items
+        <where>
+            <if test="cond.cltrNm != null and cond.cltrNm != ''">
+                AND cltr_nm LIKE CONCAT('%', #{cond.cltrNm}, '%')
+            </if>
+            <if test="cond.cltrMnmtNo != null and cond.cltrMnmtNo != ''">
+                AND cltr_mnmt_no = #{cond.cltrMnmtNo}
+            </if>
+            <if test="cond.pbctCltrStatNm != null and cond.pbctCltrStatNm != ''">
+                AND pbct_cltr_stat_nm = #{cond.pbctCltrStatNm}
+            </if>
+            <if test="cond.minBidPrcFrom != null">
+                AND min_bid_prc &gt;= #{cond.minBidPrcFrom}
+            </if>
+            <if test="cond.minBidPrcTo != null">
+                AND min_bid_prc &lt;= #{cond.minBidPrcTo}
+            </if>
+            <if test="cond.apslAsesAvgAmtFrom != null">
+                AND apsl_ases_avg_amt &gt;= #{cond.apslAsesAvgAmtFrom}
+            </if>
+            <if test="cond.apslAsesAvgAmtTo != null">
+                AND apsl_ases_avg_amt &lt;= #{cond.apslAsesAvgAmtTo}
+            </if>
+            <if test="cond.pbctBegnDtmFrom != null and cond.pbctBegnDtmFrom != ''">
+                AND pbct_begn_dtm &gt;= #{cond.pbctBegnDtmFrom}
+            </if>
+            <if test="cond.pbctBegnDtmTo != null and cond.pbctBegnDtmTo != ''">
+                AND pbct_begn_dtm &lt;= #{cond.pbctBegnDtmTo}
+            </if>
+        </where>
+    </select>
+</mapper>
