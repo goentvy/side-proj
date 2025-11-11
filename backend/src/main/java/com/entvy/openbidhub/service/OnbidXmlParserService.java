@@ -14,6 +14,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class OnbidXmlParserService {
+    // JAXB XML 파싱
     public List<OnbidItemRawDto> parse(String xml) {
         try {
             JAXBContext context = JAXBContext.newInstance(OnbidResponse.class);
@@ -32,6 +33,5 @@ public class OnbidXmlParserService {
             log.warn("XML 파싱 결과가 비어있습니다. 원본 XML: {}", xml);
             throw new RuntimeException("XML 파싱 실패", e);
         }
-
     }
 }

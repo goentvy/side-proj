@@ -14,6 +14,7 @@
         <result column="cltr_mnmt_no" property="cltrMnmtNo"/>
     </resultMap>
 
+    <!-- auction_items DB 데이터 조회 -->
     <select id="findAuctionCards" resultMap="auctionCardMap">
         SELECT
             cltr_nm,
@@ -25,5 +26,11 @@
             cltr_mnmt_no
         FROM auction_items
         ORDER BY pbct_begn_dtm DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- DB 전체 데이터 개수 조회 -->
+    <select id="countAuctionCards" resultType="long">
+        SELECT COUNT(*) FROM auction_items
     </select>
 </mapper>

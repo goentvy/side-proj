@@ -27,11 +27,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         // 인증 없이 허용할 경로
         if (path.startsWith("/api/login") ||
-                path.startsWith("/api/signup") ||
-                path.startsWith("/api/onbid") ||
-                path.startsWith("/api/auction-items/import")) {
+            path.startsWith("/api/signup") ||
+            path.startsWith("/api/onbid") ||
+            path.startsWith("/api/auction-items") ||
+            path.startsWith("/api/auction-items/import")) {
             chain.doFilter(request, response);
             return;
         }

@@ -4,6 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.entvy.openbidhub.mapper.AuctionItemMapper">
+    <!-- auction_items 테이블 데이터 저장 Mapper -->
     <insert id="insertItems">
         INSERT INTO auction_items (
         cltr_nm, pbct_cltr_stat_nm, apsl_ases_avg_amt, min_bid_prc,

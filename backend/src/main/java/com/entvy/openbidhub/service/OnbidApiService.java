@@ -1,6 +1,5 @@
 package com.entvy.openbidhub.service;
 
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -30,7 +29,7 @@ public class OnbidApiService {
 //        }
 //    }
 
-    // 공공API 호출(서울특별시 기준)
+    // 공공API 호출(전체 데이터)
     public String fetchRawXml() {
         URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
 
