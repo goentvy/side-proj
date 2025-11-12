@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -32,16 +29,22 @@ public class AuctionItemService {
     }
 
     public void saveAuctionItems() {
-        String xml = apiClient.fetchRawXml();
-        List<OnbidItemRawDto> rawDtos = parser.parse(xml);
-        if (rawDtos == null || rawDtos.isEmpty()) {
-            log.warn("파싱된 결과가 없습니다. XML: {}", xml);
+        List<String> xmlPages = apiClient.fetchAllRawXml();
+        List<OnbidItemRawDto> allDtos = new ArrayList<>();
+
+        for (String xml : xmlPages) {
+            List<OnbidItemRawDto> parsed = parser.parse(xml);
+            if (parsed != null) allDtos.addAll(parsed);
+        }
+
+        if (allDtos.isEmpty()) {
+            log.warn("전체 파싱 결과가 없습니다.");
             return;
         }
 
         // 중복 제거
         Map<String, OnbidItemRawDto> latestMap = new HashMap<>();
-        for (OnbidItemRawDto dto : rawDtos) {
+        for (OnbidItemRawDto dto : allDtos) {
             String cltrNo = dto.getCltrNo();
             OnbidItemRawDto existing = latestMap.get(cltrNo);
             if (existing == null || dto.getPbctBegnDtm().compareTo(existing.getPbctBegnDtm()) > 0) {

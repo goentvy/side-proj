@@ -1,6 +1,7 @@
 package com.entvy.openbidhub.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -8,37 +9,55 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OnbidApiService {
 
     private final RestTemplate restTemplate;
+    private final OnbidXmlParserService parser;
 
     @Value("${onbid.api.service-key}")
     private String serviceKey;
 
-//    @PostConstruct
-//    public void init() {
-//        try {
-//            System.out.println("Injected serviceKey = " + serviceKey);
-//            System.out.println("System.getenv = " + System.getenv("ONBID_SERVICE_KEY"));
-//            System.out.println("restTemplate = " + restTemplate);
-//        } catch (Exception e) {
-//            System.out.println("❌ PostConstruct failed: " + e.getMessage());
-//        }
-//    }
-
     // 공공API 호출(전체 데이터)
-    public String fetchRawXml() {
+    public List<String> fetchAllRawXml() {
         URI uri = URI.create("http://openapi.onbid.co.kr/openapi/services/KamcoPblsalThingInquireSvc/getKamcoPbctCltrList");
+        int numOfRows = 100;
+        int pageNo = 1;
+        int totalPages = 1;
+        List<String> xmlPages = new ArrayList<>();
 
-        UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
-                .queryParam("serviceKey", serviceKey)
-                .queryParam("numOfRows", "100")
-                .queryParam("pageNo", "1");
+        while (true) {
+            UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
+                    .queryParam("serviceKey", serviceKey)
+                    .queryParam("numOfRows", numOfRows)
+                    .queryParam("pageNo", pageNo);
 
-        return restTemplate.getForObject(builder.toUriString(), String.class);
+            String xml = restTemplate.getForObject(builder.toUriString(), String.class);
+            if(xml == null || xml.isBlank()) {
+                log.warn("API 응답이 비어있습니다. pageNo={}", pageNo);
+                break;
+            }
+            xmlPages.add(xml);
+
+            if (pageNo == 1) {
+                int totalCount = parser.extractTotalCount(xml);
+                totalPages = (int) Math.ceil((double) totalCount / numOfRows);
+                if (totalPages <= 1) break;
+            }
+
+            pageNo++;
+            if (pageNo > totalPages || pageNo > 50) {
+                log.info("페이지 수 초과로 반복 종료: pageNo={}, totalPages={}", pageNo, totalPages);
+                break;
+            }
+        }
+
+        return xmlPages;
     }
 
     public String fetchRawData() {
