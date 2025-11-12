@@ -1,14 +1,15 @@
 import { useMemo, useState } from "react";
 import { Input, Button, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui";
 import type { OnbidItemSearchCondition } from "@/types";
-import RegionSelect from "../RegionSelect";
 import { formatToFullDate } from "@/lib/date";
+import BidDateRangePicker from "../BidDateRangePicker";
 
 interface Props {
-  onSubmit: (cond: OnbidItemSearchCondition) => void;
+  onSubmit: (cond: OnbidItemSearchCondition | null) => void;
+  onShowAll: () => void;
 }
 
-const SearchForm = ({ onSubmit }: Props) => {
+const SearchForm = ({ onSubmit, onShowAll }: Props) => {
   const initialForm = useMemo<OnbidItemSearchCondition>(() => ({
     sido: "",
     sgk: "",
@@ -26,13 +27,6 @@ const SearchForm = ({ onSubmit }: Props) => {
 
   const [form, setForm] = useState<OnbidItemSearchCondition>(initialForm);
 
-  const handleRegionChange = (name: string, value: string) => {
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type } = e.target;
     const isFullDateField = name === "pbctBegnDtmFrom" || name === "pbctBegnDtmTo";
@@ -44,19 +38,35 @@ const SearchForm = ({ onSubmit }: Props) => {
     }));
   };
 
+  const handleDateChange = (name: keyof OnbidItemSearchCondition, date: Date | null) => {
+    setForm((prev) => ({
+      ...prev,
+      [name]: date ? date.toISOString().slice(0, 19) : "",
+    }));
+  };
+
   const handleSelectChange = (value: string) => {
     setForm((prev) => ({ ...prev, pbctCltrStatNm: value === "all" ? "" : value, }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("검색 조건: ", form);
     onSubmit(form);
+  };
+
+  const handleReset = () => {
+    setForm(initialForm); // 입력 필드만 초기화
+  };
+
+  const handleShowAll = () => {
+    setForm(initialForm);
+    onShowAll();
   };
 
   return (
     <form onSubmit={handleSubmit} className="grid gap-4">
       <Input name="cltrNm" placeholder="물건명" value={form.cltrNm} onChange={handleChange} />
-      {/* <RegionSelect form={form} onChange={handleRegionChange} /> */}
 
       <Input name="minBidPrcFrom" type="number" placeholder="최저 입찰가" value={form.minBidPrcFrom ?? ''} onChange={handleChange} />
       <Input name="minBidPrcTo" type="number" placeholder="최고 입찰가" value={form.minBidPrcTo ?? ''} onChange={handleChange} />
@@ -70,25 +80,40 @@ const SearchForm = ({ onSubmit }: Props) => {
         </SelectTrigger>
         <SelectContent>
           <SelectItem value="all">전체</SelectItem>
-          <SelectItem value="입찰중">입찰중</SelectItem>
+          <SelectItem value="입찰준비중">입찰준비중</SelectItem>
+          <SelectItem value="인터넷입찰진행중">인터넷입찰진행중</SelectItem>
           <SelectItem value="마감">마감</SelectItem>
         </SelectContent>
       </Select>
 
-      <Input 
-        name="pbctBegnDtmFrom" 
-        placeholder="입찰 시작일 (예: 20250901140000)" 
-        value={form.pbctBegnDtmFrom} 
-        onChange={handleChange} />
-      <Input 
-        name="pbctBegnDtmTo" 
-        placeholder="입찰 종료일 (예: 20250901140000)" 
-        value={form.pbctBegnDtmTo} 
-        onChange={handleChange} />
+      <BidDateRangePicker
+        pbctBegnDtmFrom={form.pbctBegnDtmFrom ? new Date(form.pbctBegnDtmFrom) : null}
+        pbctBegnDtmTo={form.pbctBegnDtmTo ? new Date(form.pbctBegnDtmTo) : null}
+        onChangeStart={(date) => handleDateChange("pbctBegnDtmFrom", date)}
+        onChangeEnd={(date) => handleDateChange("pbctBegnDtmTo", date)}
+      />
 
       <Input name="cltrMnmtNo" placeholder="관리번호 (예: 202509964001)" value={form.cltrMnmtNo} onChange={handleChange} />
 
-      <Button type="submit">검색</Button>
+      <div className="flex flex-wrap gap-2 justify-start mt-4">
+        <Button type="submit" className="bg-blue-600 text-white hover:bg-blue-700">
+          🔍 검색
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleReset}
+        >
+          ↺ 초기화
+        </Button>
+        <Button
+          type="button"
+          className="bg-gradient-to-r from-indigo-500 to-purple-600 text-white hover:scale-105 transition-transform"
+          onClick={handleShowAll}
+        >
+          📂 전체 데이터 보기
+        </Button>
+      </div>
     </form>
   );
 };
