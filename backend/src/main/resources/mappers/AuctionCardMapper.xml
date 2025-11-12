@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.AuctionCardMapper">
+    <resultMap id="auctionCardMap" type="com.entvy.openbidhub.dto.AuctionCardDto">
+        <result column="cltr_nm" property="cltrNm"/>
+        <result column="pbct_cltr_stat_nm" property="pbctCltrStatNm"/>
+        <result column="apsl_ases_avg_amt" property="apslAsesAvgAmt"/>
+        <result column="min_bid_prc" property="minBidPrc"/>
+        <result column="pbct_begn_dtm" property="pbctBegnDtm"/>
+        <result column="pbct_cls_dtm" property="pbctClsDtm"/>
+        <result column="cltr_mnmt_no" property="cltrMnmtNo"/>
+    </resultMap>
+
+    <!-- auction_items DB 데이터 조회 -->
+    <select id="findAuctionCards" resultMap="auctionCardMap">
+        SELECT
+            cltr_nm,
+            pbct_cltr_stat_nm,
+            apsl_ases_avg_amt,
+            min_bid_prc,
+            pbct_begn_dtm,
+            pbct_cls_dtm,
+            cltr_mnmt_no
+        FROM auction_items
+        ORDER BY pbct_begn_dtm DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- DB 전체 데이터 개수 조회 -->
+    <select id="countAuctionCards" resultType="long">
+        SELECT COUNT(*) FROM auction_items
+    </select>
+</mapper>

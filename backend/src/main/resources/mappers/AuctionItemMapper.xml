@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.AuctionItemMapper">
+    <!-- auction_items 테이블 데이터 저장 Mapper -->
+    <insert id="insertItems">
+        INSERT INTO auction_items (
+        cltr_nm, pbct_cltr_stat_nm, apsl_ases_avg_amt, min_bid_prc,
+        pbct_begn_dtm, pbct_cls_dtm, cltr_mnmt_no, cltr_no, pbct_no, source, created_at, updated_at
+        )
+        VALUES
+        <foreach collection="items" item="item" separator=",">
+            (
+            #{item.cltrNm}, #{item.pbctCltrStatNm}, #{item.apslAsesAvgAmt}, #{item.minBidPrc},
+            #{item.pbctBegnDtm}, #{item.pbctClsDtm}, #{item.cltrMnmtNo},
+            #{item.cltrNo}, #{item.pbctNo}, #{item.source}, #{item.createdAt}, #{item.updatedAt}
+            )
+        </foreach>
+    </insert>
+</mapper>

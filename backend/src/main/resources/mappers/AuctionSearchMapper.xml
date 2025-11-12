@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.AuctionSearchMapper">
+    <resultMap id="AuctionCardDtoMap" type="com.entvy.openbidhub.dto.AuctionCardDto">
+        <result property="cltrNm" column="cltr_nm"/>
+        <result property="cltrMnmtNo" column="cltr_mnmt_no"/>
+        <result property="pbctCltrStatNm" column="pbct_cltr_stat_nm"/>
+        <result property="minBidPrc" column="min_bid_prc"/>
+        <result property="apslAsesAvgAmt" column="apsl_ases_avg_amt"/>
+        <result property="pbctBegnDtm" column="pbct_begn_dtm"/>
+        <result property="pbctClsDtm" column="pbct_cls_dtm"/>
+    </resultMap>
+    <!-- 조건 검색 데이터 조회 -->
+    <select id="searchByCondition"
+            parameterType="com.entvy.openbidhub.dto.OnbidItemSearchCondition"
+            resultMap="AuctionCardDtoMap">
+        SELECT
+        cltr_nm,
+        cltr_mnmt_no,
+        pbct_cltr_stat_nm,
+        min_bid_prc,
+        apsl_ases_avg_amt,
+        pbct_begn_dtm,
+        pbct_cls_dtm
+        FROM auction_items
+        WHERE 1=1
+        <if test="cond.cltrNm != null and cond.cltrNm != ''">
+            AND cltr_nm LIKE CONCAT('%', #{cond.cltrNm}, '%')
+        </if>
+        <if test="cond.cltrMnmtNo != null and cond.cltrMnmtNo != ''">
+            AND cltr_mnmt_no = #{cond.cltrMnmtNo}
+        </if>
+        <if test="cond.pbctCltrStatNm != null and cond.pbctCltrStatNm != ''">
+            AND pbct_cltr_stat_nm = #{cond.pbctCltrStatNm}
+        </if>
+        <if test="cond.minBidPrcFrom != null">
+            AND min_bid_prc &gt;= #{cond.minBidPrcFrom}
+        </if>
+        <if test="cond.minBidPrcTo != null">
+            AND min_bid_prc &lt;= #{cond.minBidPrcTo}
+        </if>
+        <if test="cond.apslAsesAvgAmtFrom != null">
+            AND apsl_ases_avg_amt &gt;= #{cond.apslAsesAvgAmtFrom}
+        </if>
+        <if test="cond.apslAsesAvgAmtTo != null">
+            AND apsl_ases_avg_amt &lt;= #{cond.apslAsesAvgAmtTo}
+        </if>
+        <if test="cond.pbctBegnDtmFrom != null and cond.pbctBegnDtmTo != null">
+            AND pbct_begn_dtm BETWEEN #{cond.pbctBegnDtmFrom} AND #{cond.pbctBegnDtmTo}
+        </if>
+        <choose>
+            <when test="cond.sortColumn != null and cond.sortDirection != null">
+                ORDER BY ${cond.safeSortColumn} ${cond.safeSortDirection}
+            </when>
+            <otherwise>
+                ORDER BY pbct_begn_dtm DESC
+            </otherwise>
+        </choose>
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 전체 데이터 개수 조회 -->
+    <select id="countByCondition"
+            parameterType="com.entvy.openbidhub.dto.OnbidItemSearchCondition"
+            resultType="long">
+        SELECT COUNT(*)
+        FROM auction_items
+        <where>
+            <if test="cond.cltrNm != null and cond.cltrNm != ''">
+                AND cltr_nm LIKE CONCAT('%', #{cond.cltrNm}, '%')
+            </if>
+            <if test="cond.cltrMnmtNo != null and cond.cltrMnmtNo != ''">
+                AND cltr_mnmt_no = #{cond.cltrMnmtNo}
+            </if>
+            <if test="cond.pbctCltrStatNm != null and cond.pbctCltrStatNm != ''">
+                AND pbct_cltr_stat_nm = #{cond.pbctCltrStatNm}
+            </if>
+            <if test="cond.minBidPrcFrom != null">
+                AND min_bid_prc &gt;= #{cond.minBidPrcFrom}
+            </if>
+            <if test="cond.minBidPrcTo != null">
+                AND min_bid_prc &lt;= #{cond.minBidPrcTo}
+            </if>
+            <if test="cond.apslAsesAvgAmtFrom != null">
+                AND apsl_ases_avg_amt &gt;= #{cond.apslAsesAvgAmtFrom}
+            </if>
+            <if test="cond.apslAsesAvgAmtTo != null">
+                AND apsl_ases_avg_amt &lt;= #{cond.apslAsesAvgAmtTo}
+            </if>
+            <if test="cond.pbctBegnDtmFrom != null and cond.pbctBegnDtmTo != null">
+                AND pbct_begn_dtm BETWEEN #{cond.pbctBegnDtmFrom} AND #{cond.pbctBegnDtmTo}
+            </if>
+        </where>
+    </select>
+</mapper>
