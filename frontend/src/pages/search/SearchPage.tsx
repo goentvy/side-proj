@@ -2,67 +2,68 @@ import SearchForm from "@/components/search/SearchForm";
 import SearchResults from "@/components/search/SearchResults";
 import type { OnbidItemSearchCondition, OnbidItemResponse } from "@/types";
 import { useEffect, useState } from "react";
-import api from "@/api/api";
+import api from "@/api/apiAuction";
 import toast from "react-hot-toast";
+import { formatCltrMnmtNo } from "@/lib/date";
 
 const SearchPage = () => {
-  const [allItems, setAllItems] = useState<OnbidItemResponse[]>([]);
+  const [userRequestedAll, setUserRequestedAll] = useState<boolean>(false);
   const [filtered, setFiltered] = useState<OnbidItemResponse[]>([]);
   const [cond, setCond] = useState<OnbidItemSearchCondition | null>(null);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
-  // 초기 전체 데이터 로딩
+  const handleShowAll = () => {
+    setCond(null);
+    setUserRequestedAll(true);
+    setPage(0);
+  }
+
   useEffect(() => {
-    api.get("/items")
-    .then(res => {
-      setAllItems(res.data.content);
-      setFiltered(res.data.content);
-    })
-    .catch(err => {
-      toast.error("전체 물건 조회 실패");
-      console.error("전체 물건 조회 실패: ", err);
-    });
-  }, []);
+    const fetchData = async () => {
+      const params = new URLSearchParams();
+      params.append("page", String(page));
+      params.append("size", String(ITEMS_PER_PAGE));
 
-  // 조건이 변경되면 필터링
-  useEffect(() => {
-  if (!cond) return;
+      if (cond) {
+        Object.entries(cond).forEach(([key, value]) => {
+          if (value !== undefined && value !== "") {
+            const formattedValue = key === "cltrMnmtNo" ? formatCltrMnmtNo(String(value)) : String(value);
+            params.append(key, formattedValue);
+          }
+        });
+      }
 
-  const filteredItems = allItems.filter(item => {
-    // 시도, 시군구, 읍면동
-    if (cond.sido && item.sido !== cond.sido) return false;
-    if (cond.sgk && item.sgk !== cond.sgk) return false;
-    if (cond.emd && item.emd !== cond.emd) return false;
-
-    // 물건명 검색 (부분 일치)
-    if (cond.cltrNm && !item.cltrNm.includes(cond.cltrNm)) return false;
-
-    // 물건관리번호 (정확 일치)
-    if (cond.cltrMnmtNo && item.cltrMnmtNo !== cond.cltrMnmtNo) return false;
-
-    // 입찰 상태
-    if (cond.bidStatus && item.bidStatus !== cond.bidStatus) return false;
-
-    // 가격 조건
-    if (cond.openPriceFrom && item.openPrice < cond.openPriceFrom) return false;
-    if (cond.openPriceTo && item.openPrice > cond.openPriceTo) return false;
-    if (cond.goodsPriceFrom && item.goodsPrice < cond.goodsPriceFrom) return false;
-    if (cond.goodsPriceTo && item.goodsPrice > cond.goodsPriceTo) return false;
-
-    // 입찰 시작일
-    if (cond.pbctBegnDtFrom && item.pbctBegnDt < cond.pbctBegnDtFrom) return false;
-    if (cond.pbctBegnDtTo && item.pbctBegnDt > cond.pbctBegnDtTo) return false;
-
-    return true;
-  });
-
-  setFiltered(filteredItems);
-}, [cond, allItems]);
-
+      try {
+        const endpoint = cond ? "/auction-items" : "/onbid/cards";
+        const res = await api.get(`${endpoint}?${params.toString()}`);
+        setFiltered(res.data.content);
+        setTotalPages(res.data.totalPages);
+        setUserRequestedAll(true);
+      } catch (err) {
+        toast.error("데이터 불러오기 실패");
+        console.error("데이터 불러오기 실패: ", err);
+      }
+    };
+    if (cond === null && !userRequestedAll) return;
+    fetchData();
+  }, [cond, page, userRequestedAll]);
 
   return (
     <div>
-      <SearchForm onSubmit={setCond} />
-      <SearchResults cond={cond} lists={filtered} />
+      <SearchForm onSubmit={setCond} onShowAll={handleShowAll} />
+      {filtered.length === 0 && !cond && !userRequestedAll ? (
+        <div className="text-center text-gray-400 mt-6">검색 조건을 입력하거나 전체 보기를 눌러주세요.</div>
+      ): (
+        <SearchResults
+          lists={filtered}
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
+      )}
+      
     </div>
   );
 };

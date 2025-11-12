@@ -3,27 +3,24 @@ export interface OnbidItemSearchCondition {
   sgk?: string;
   emd?: string;
   cltrNm?: string;
-  openPriceFrom?: number;
-  openPriceTo?: number;
-  goodsPriceFrom?: number;
-  goodsPriceTo?: number;
-  bidStatus?: string;
-  pbctBegnDtFrom?: string;
-  pbctBegnDtTo?: string;
   cltrMnmtNo?: string;
+  pbctCltrStatNm?: string;
+  minBidPrcFrom?: number;
+  minBidPrcTo?: number;
+  apslAsesAvgAmtFrom?: number;
+  apslAsesAvgAmtTo?: number;
+  pbctBegnDtmFrom?: string;
+  pbctBegnDtmTo?: string;
 }
 
 export interface OnbidItemResponse {
   cltrMnmtNo: string;
   cltrNm: string;
-  sido: string;
-  sgk: string;
-  emd: string;
-  goodsPrice: number;
-  openPrice: number;
-  pbctBegnDt: string;
-  pbctClsDt: string;
-  bidStatus: string;
+  apslAsesAvgAmt: number;
+  minBidPrc: number;
+  pbctBegnDtm: string;
+  pbctClsDtm: string;
+  pbctCltrStatNm: string;
 }
 
 export interface PageResponse<T> {

@@ -2,21 +2,26 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { regions } from "@/lib/regions";
 import type { OnbidItemSearchCondition } from "@/types";
 
-interface Props {
+interface RegionSelectProps {
   form: OnbidItemSearchCondition;
-  setForm: React.Dispatch<React.SetStateAction<OnbidItemSearchCondition>>;
+  onChange: (name: string, value: string) => void;
 }
 
-const RegionSelect = ({ form, setForm }: Props) => {
+const RegionSelect = ({ form, onChange }: RegionSelectProps) => {
   const selectedSido = regions.find(r => r.sido === form.sido);
   const selectedSigungu = selectedSido?.sigungu.find(s => s.name === form.sgk);
   const uniqueSidoList = Array.from(new Set(regions.map(r => r.sido)));
 
   return (
     <div className="grid gap-4">
-      <Select value={form.sido} onValueChange={(value) => {
-        setForm(prev => ({ ...prev, sido: value, sgk: "", emd: "" }));
-      }}>
+      <Select
+        value={form.sido}
+        onValueChange={(value) => {
+          onChange("sido", value);
+          onChange("sgk", "");
+          onChange("emd", "");
+        }}
+      >
         <SelectTrigger><SelectValue placeholder="시도 선택" /></SelectTrigger>
         <SelectContent>
           {uniqueSidoList.map(sido => (
@@ -25,9 +30,14 @@ const RegionSelect = ({ form, setForm }: Props) => {
         </SelectContent>
       </Select>
 
-      <Select value={form.sgk} onValueChange={(value) => {
-        setForm(prev => ({ ...prev, sgk: value, emd: "" }));
-      }} disabled={!form.sido}>
+      <Select
+        value={form.sgk}
+        onValueChange={(value) => {
+          onChange("sgk", value);
+          onChange("emd", "");
+        }}
+        disabled={!form.sido}
+      >
         <SelectTrigger><SelectValue placeholder="시군구 선택" /></SelectTrigger>
         <SelectContent>
           {Array.from(new Set(selectedSido?.sigungu.map(s => s.name))).map(name => (
@@ -36,9 +46,13 @@ const RegionSelect = ({ form, setForm }: Props) => {
         </SelectContent>
       </Select>
 
-      <Select value={form.emd} onValueChange={(value) => {
-        setForm(prev => ({ ...prev, emd: value }));
-      }} disabled={!form.sgk}>
+      <Select
+        value={form.emd}
+        onValueChange={(value) => {
+          onChange("emd", value);
+        }}
+        disabled={!form.sgk}
+      >
         <SelectTrigger><SelectValue placeholder="읍면동 선택" /></SelectTrigger>
         <SelectContent>
           {Array.from(new Set(selectedSigungu?.eupmyeon)).map(e => (
