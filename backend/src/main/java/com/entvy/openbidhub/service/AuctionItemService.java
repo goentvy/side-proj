@@ -1,95 +1,102 @@
 package com.entvy.openbidhub.service;
 
 import com.entvy.openbidhub.domain.AuctionItemEntity;
+import com.entvy.openbidhub.domain.OnbidRawItemEntity;
 import com.entvy.openbidhub.dto.AuctionCardDto;
 import com.entvy.openbidhub.mapper.AuctionItemMapper;
-import com.entvy.openbidhub.openapi.xml.OnbidItemRawDto;
+import com.entvy.openbidhub.mapper.OnbidRawItemMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.*;
 
 @Slf4j
 @Service
 public class AuctionItemService {
-
-    private final OnbidXmlParserService parser;
-    private final OnbidApiService apiClient;
     private final AuctionItemMapper auctionItemMapper;
+    private final OnbidRawItemMapper rawItemMapper;
 
-    public AuctionItemService(OnbidXmlParserService parser,
-                              OnbidApiService apiClient,
-                              AuctionItemMapper auctionItemMapper) {
-        this.parser = parser;
-        this.apiClient = apiClient;
+    public AuctionItemService(AuctionItemMapper auctionItemMapper, OnbidRawItemMapper rawItemMapper) {
         this.auctionItemMapper = auctionItemMapper;
+        this.rawItemMapper = rawItemMapper;
     }
 
-    public void saveAuctionItems() {
-        List<String> xmlPages = apiClient.fetchAllRawXml();
-        List<OnbidItemRawDto> allDtos = new ArrayList<>();
+    public int processAndSave() {
+        List<OnbidRawItemEntity> rawItems = rawItemMapper.findAll();
+        List<AuctionItemEntity> processed = filterLatestItems(rawItems);
+        auctionItemMapper.insertItems(processed);
+        return processed.size();
+    }
 
-        for (String xml : xmlPages) {
-            List<OnbidItemRawDto> parsed = parser.parse(xml);
-            if (parsed != null) allDtos.addAll(parsed);
+    private AuctionItemEntity convertToAuctionItem(OnbidRawItemEntity item) {
+        LocalDateTime begn = item.getPbctBegnDtm();
+        LocalDateTime cls = item.getPbctClsDtm();
+
+        // 문자열로 들어오는 경우 파싱
+        if (begn == null && item.getRawPbctBegnDtm() != null) {
+            begn = parseKoreanDate(item.getRawPbctBegnDtm());
+        }
+        if (cls == null && item.getRawPbctClsDtm() != null) {
+            cls = parseKoreanDate(item.getRawPbctClsDtm());
         }
 
-        if (allDtos.isEmpty()) {
-            log.warn("전체 파싱 결과가 없습니다.");
-            return;
+        if (begn == null || cls == null) {
+            log.warn("입찰 날짜 누락으로 제외됨: cltrNo={}, pbctNo={}", item.getCltrNo(), item.getPbctNo());
+            return null;
         }
 
-        // 중복 제거
-        Map<String, OnbidItemRawDto> latestMap = new HashMap<>();
-        for (OnbidItemRawDto dto : allDtos) {
-            String cltrNo = dto.getCltrNo();
-            OnbidItemRawDto existing = latestMap.get(cltrNo);
-            if (existing == null || dto.getPbctBegnDtm().compareTo(existing.getPbctBegnDtm()) > 0) {
-                latestMap.put(cltrNo, dto);
-            }
+        AuctionCardDto dto = new AuctionCardDto(
+                item.getCltrNm(),
+                item.getPbctCltrStatNm(),
+                item.getApslAsesAvgAmt(),
+                item.getMinBidPrc(),
+                begn.toLocalDate(),
+                cls.toLocalDate(),
+                item.getCltrMnmtNo()
+        );
+        return dto.toEntity(item.getCltrNo(), item.getPbctNo());
+    }
+
+    private List<AuctionItemEntity> filterLatestItems(List<OnbidRawItemEntity> rawItems) {
+        Map<String, OnbidRawItemEntity> latestMap = new HashMap<>();
+        for (OnbidRawItemEntity item : rawItems) {
+            if(item.getCltrNo() == null || item.getPbctBegnDtm() == null) continue;
+            latestMap.compute(item.getCltrNo(), (key, existing) ->
+                    (existing == null || item.getPbctBegnDtm().isAfter(existing.getPbctBegnDtm())) ? item : existing
+            );
         }
 
-        // DTO → Entity 변환
-        List<AuctionItemEntity> entities = latestMap.values().stream()
-                .map(dto -> AuctionItemEntity.from(
-                        new AuctionCardDto(
-                                dto.getCltrNm(),
-                                dto.getPbctCltrStatNm(),
-                                parseLong(dto.getApslAsesAvgAmt()),
-                                parseLong(dto.getMinBidPrc()),
-                                formatDate(dto.getPbctBegnDtm()),
-                                formatDate(dto.getPbctClsDtm()),
-                                dto.getCltrMnmtNo()
-                        ),
-                        dto.getCltrNo(),
-                        dto.getPbctNo()
-                ))
+        log.info("원본 {}건 중 중복 제거 후 {}건 처리됨", rawItems.size(), latestMap.size());
+
+        return latestMap.values().stream()
+                .map(this::convertToAuctionItem)
+                .filter(Objects::nonNull)
                 .toList();
-
-        auctionItemMapper.insertItems(entities);
     }
+    private LocalDateTime parseKoreanDate(String raw) {
+        if (raw == null || raw.isBlank()) return null;
+        raw = raw.trim();
 
-    private Long parseLong(String value) {
         try {
-            return Long.parseLong(value.replaceAll(",", "").trim());
-        } catch (NumberFormatException e) {
-            return null; // 또는 0L, 예외 처리 방식에 따라
-        }
-    }
-    private String formatDate(String rawDateTime) {
-        if (rawDateTime == null || rawDateTime.isBlank()) return null;
-        try {
-            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-            LocalDateTime dateTime = LocalDateTime.parse(rawDateTime, inputFormatter);
+            // 오전/오후가 포함된 경우
+            if (raw.contains("오전") || raw.contains("오후")) {
+                String normalized = raw
+                        .replace("오전", "AM")
+                        .replace("오후", "PM");
 
-            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("yy.MM.dd a hh시", Locale.KOREAN);
-            return dateTime.format(outputFormatter);
-        } catch (DateTimeParseException e) {
-            return rawDateTime; // 실패 시 원본 반환
-        }
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd a hh:mm:ss", Locale.KOREAN);
+                return LocalDateTime.parse(normalized, formatter);
+            }
 
+            // 일반적인 24시간제 형식
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            return LocalDateTime.parse(raw, formatter);
+
+        } catch (Exception e) {
+            log.warn("날짜 파싱 실패: {}", raw);
+            return null;
+        }
     }
 }

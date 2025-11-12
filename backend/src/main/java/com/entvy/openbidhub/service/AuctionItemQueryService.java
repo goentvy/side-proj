@@ -17,15 +17,19 @@ import java.util.List;
 public class AuctionItemQueryService {
 
     private final AuctionSearchMapper auctionSearchMapper;
-    private final AuctionItemMapper auctionItemMapper;
 
     public Page<AuctionCardDto> search(OnbidItemSearchCondition cond, Pageable pageable) {
         int size = pageable.getPageSize();
-        int offset = pageable.getPageNumber() * size;
+        int offset = calculateOffset(pageable);
 
-        List<AuctionCardDto> items = auctionSearchMapper.searchByCondition(cond, size, offset);
-        long total = auctionSearchMapper.countByCondition(cond);
-        return new PageImpl<>(items, pageable, total);
+        List<AuctionCardDto> results = auctionSearchMapper.searchByCondition(cond, size, offset);
+        long totalCount = auctionSearchMapper.countByCondition(cond);
+
+        return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    private int calculateOffset(Pageable pageable) {
+        return pageable.getPageNumber() * pageable.getPageSize();
     }
 }
 

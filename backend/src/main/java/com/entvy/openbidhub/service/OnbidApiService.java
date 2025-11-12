@@ -1,5 +1,6 @@
 package com.entvy.openbidhub.service;
 
+import com.google.common.util.concurrent.RateLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,8 @@ public class OnbidApiService {
     private final RestTemplate restTemplate;
     private final OnbidXmlParserService parser;
 
+    private final RateLimiter rateLimiter = RateLimiter.create(3.0);
+
     @Value("${onbid.api.service-key}")
     private String serviceKey;
 
@@ -31,7 +34,9 @@ public class OnbidApiService {
         int totalPages = 1;
         List<String> xmlPages = new ArrayList<>();
 
-        while (true) {
+        while (pageNo <= totalPages) {
+            rateLimiter.acquire();
+
             UriComponentsBuilder builder = UriComponentsBuilder.fromUri(uri)
                     .queryParam("serviceKey", serviceKey)
                     .queryParam("numOfRows", numOfRows)

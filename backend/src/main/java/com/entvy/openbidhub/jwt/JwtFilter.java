@@ -36,8 +36,14 @@ public class JwtFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/login") ||
             path.startsWith("/api/signup") ||
             path.startsWith("/api/onbid") ||
+            path.startsWith("/api/raw-items") ||
+            path.startsWith("/api/raw-items/import") ||
             path.startsWith("/api/auction-items") ||
-            path.startsWith("/api/auction-items/import")) {
+            path.startsWith("/api/auction-items/import") ||
+            path.startsWith("/swagger-ui") ||
+            path.startsWith("/v3/api-docs") ||
+            path.startsWith("/api-docs") ||
+            path.startsWith("/swagger-ui.html")) {
             chain.doFilter(request, response);
             return;
         }
