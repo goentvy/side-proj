@@ -26,7 +26,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/**").permitAll()
-                    .requestMatchers("/api/login", "/api/signup", "/api/onbid/**", "/api/onbid/cards","/api/auction-items/import").permitAll()
+                    .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
+                    .requestMatchers("/api/login", "/api/signup", "/api/onbid/**", "/api/onbid/cards","/api/auction-items/import", "/api/raw-items/import").permitAll()
                     .requestMatchers("/api/admin").hasAuthority("ADMIN")
                     .requestMatchers("/api/user").hasAnyRole("USER", "ADMIN")
                     .anyRequest().authenticated()

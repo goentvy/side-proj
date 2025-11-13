@@ -22,9 +22,9 @@ public class TestUserInserter implements CommandLineRunner {
     @Override
     public void run(String... args) {
         List<User> testUsers = List.of(
-                createUser("admin@openbidhub.com", "ADMIN"),
-                createUser("user1@openbidhub.com", "USER"),
-                createUser("user2@openbidhub.com", "USER")
+                createUser("admin@test.com", "ADMIN"),
+                createUser("user1@test.com", "USER"),
+                createUser("user2@test.com", "USER")
         );
 
         for (User user : testUsers) {

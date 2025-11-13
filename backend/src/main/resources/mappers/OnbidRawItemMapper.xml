@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.OnbidRawItemMapper">
+    <!-- 전체 데이터 조회 -->
+    <select id="findAll" resultType="com.entvy.openbidhub.domain.OnbidRawItemEntity">
+        SELECT
+            id, rnum, plnm_no, pbct_no, pbct_cdtn_no, cltr_no, cltr_hstr_no,
+            scrn_grp_cd, ctgr_full_nm, bid_mnmt_no, cltr_nm, cltr_mnmt_no,
+            ldnm_adrs, nmrd_adrs, ldnm_pnu, dpsl_mtd_cd, dpsl_mtd_nm, bid_mtd_nm,
+            min_bid_prc, apsl_ases_avg_amt, fee_rate, pbct_begn_dtm, pbct_cls_dtm,
+            pbct_cltr_stat_nm, uscb_cnt, iqry_cnt, goods_nm, manuf, mdl, nrgt,
+            grbx, endpc, vhcl_mlge, fuel, scrt_nm, tpbz, itm_nm, mmb_rgt_nm,
+            cltr_img_files, created_at
+        FROM onbid_raw_items
+    </select>
+    <!-- 전체 데이터 삽입 -->
+    <insert id="insertAll" parameterType="java.util.List">
+        INSERT INTO onbid_raw_items (
+        rnum, plnm_no, pbct_no, pbct_cdtn_no, cltr_no, cltr_hstr_no,
+        scrn_grp_cd, ctgr_full_nm, bid_mnmt_no, cltr_nm, cltr_mnmt_no,
+        ldnm_adrs, nmrd_adrs, ldnm_pnu, dpsl_mtd_cd, dpsl_mtd_nm, bid_mtd_nm,
+        min_bid_prc, apsl_ases_avg_amt, fee_rate, pbct_begn_dtm, pbct_cls_dtm,
+        pbct_cltr_stat_nm, uscb_cnt, iqry_cnt, goods_nm, manuf, mdl, nrgt,
+        grbx, endpc, vhcl_mlge, fuel, scrt_nm, tpbz, itm_nm, mmb_rgt_nm,
+        cltr_img_files, created_at
+        )
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (
+            #{item.rnum}, #{item.plnmNo}, #{item.pbctNo}, #{item.pbctCdtnNo}, #{item.cltrNo}, #{item.cltrHstrNo},
+            #{item.scrnGrpCd}, #{item.ctgrFullNm}, #{item.bidMnmtNo}, #{item.cltrNm}, #{item.cltrMnmtNo},
+            #{item.ldnmAdrs}, #{item.nmrdAdrs}, #{item.ldnmPnu}, #{item.dpslMtdCd}, #{item.dpslMtdNm}, #{item.bidMtdNm},
+            #{item.minBidPrc}, #{item.apslAsesAvgAmt}, #{item.feeRate}, #{item.pbctBegnDtm}, #{item.pbctClsDtm},
+            #{item.pbctCltrStatNm}, #{item.uscbCnt}, #{item.iqryCnt}, #{item.goodsNm}, #{item.manuf}, #{item.mdl}, #{item.nrgt},
+            #{item.grbx}, #{item.endpc}, #{item.vhclMlge}, #{item.fuel}, #{item.scrtNm}, #{item.tpbz}, #{item.itmNm}, #{item.mmbRgtNm},
+            #{item.cltrImgFiles}, NOW()
+            )
+        </foreach>
+    </insert>
+</mapper>
