@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
@@ -30,11 +29,7 @@ public class AuthController {
 
     @Operation(
         summary = "로그인",
-        description = "이메일과 비밀번호로 로그인하고 JWT 토큰을 발급받습니다.",
-        requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-            description = "로그인 요청",
-            required = true
-        )
+        description = "이메일과 비밀번호로 로그인하고 JWT 토큰을 발급받습니다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
