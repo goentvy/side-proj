@@ -1,9 +1,10 @@
-import { useUser } from '../pages/hook/useUser';
+import { useAuth } from '@/hook/useAuth';
 
 export default function ProfilePage() {
-  const user = useUser();
+  const { user, isLoading, isAuthenticated } = useAuth();
 
-  if (!user) return <p>로딩 중...</p>;
+  if (isLoading) return <p>로딩 중...</p>;
+  if (!isAuthenticated || !user) return <p>로그인이 필요합니다.</p>;
 
   return (
     <div>

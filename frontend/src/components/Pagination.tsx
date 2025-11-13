@@ -7,26 +7,38 @@ interface Props {
 }
 
 const Pagination = ({ currentPage, totalPages, onPageChange }: Props) => {
-  const prevDisabled = currentPage <= 0;
-  const nextDisabled = currentPage >= totalPages - 1;
+  const visiblePages = 5;
+  const startPage = Math.max(0, currentPage - Math.floor(visiblePages / 2));
+  const endPage = Math.min(totalPages - 1, startPage + visiblePages - 1);
+
+  const pages = [];
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
 
   return (
-    <div className="flex items-center justify-center gap-2 mt-4">
+    <div className="flex items-center justify-center gap-2 mt-6">
       <Button
         variant="outline"
-        disabled={prevDisabled}
+        disabled={currentPage === 0}
         onClick={() => onPageChange(currentPage - 1)}
       >
         이전
       </Button>
 
-      <span className="text-sm text-muted-foreground">
-        {currentPage + 1} / {totalPages}
-      </span>
+      {pages.map((page) => (
+        <Button
+          key={page}
+          className={`btn ${page === currentPage ? "btn-active" : ""}`}
+          onClick={() => onPageChange(page)}
+        >
+          {page + 1}
+        </Button>
+      ))}
 
       <Button
         variant="outline"
-        disabled={nextDisabled}
+        disabled={currentPage === totalPages - 1}
         onClick={() => onPageChange(currentPage + 1)}
       >
         다음

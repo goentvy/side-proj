@@ -1,9 +1,10 @@
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
 import { ThemeProvider } from './components/theme-provider'
-import { ModeToggle } from './components/mode-toggle'
 import { Toaster } from 'react-hot-toast'
 import { SecureRoute } from './routes'
+import { useEffect } from 'react'
+import { useAuthStore } from './store/authStore'
 
 // 페이지 컴포넌트
 import Login from './pages/Login'
@@ -15,14 +16,19 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import PartnerDashboard from './pages/partner/PartnerDashboard'
 import UnauthorizedPage from './pages/UnauthorizedPage'
 import SearchPage from './pages/search/SearchPage'
-
+import Header from './components/Header'
 
 function App() {
+
+  useEffect(() => {
+    useAuthStore.getState().fetchUser();
+  }, []);
+
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <Toaster position="top-center" />
       <div className="bg-background text-foreground min-h-screen">
-        <ModeToggle />
+        <Header />
 
         <Routes>
           {/* 공통 */}
@@ -36,7 +42,7 @@ function App() {
             path="/user/dashboard" 
             element={
               <SecureRoute allowedRoles={['USER']}>
-                {(user) => <UserDashboard user={user}/>}
+                <UserDashboard />
               </SecureRoute>
             }
           />
@@ -44,7 +50,7 @@ function App() {
             path="/admin/dashboard" 
             element={
               <SecureRoute allowedRoles={['ADMIN']}>
-                {(user) => <AdminDashboard user={user}/>}
+                <AdminDashboard />
               </SecureRoute>
             }
           />
@@ -52,7 +58,7 @@ function App() {
             path="/partner/dashboard" 
             element={
               <SecureRoute allowedRoles={['PARTNER']}>
-                {(user) => <PartnerDashboard user={user}/>}
+                <PartnerDashboard />
               </SecureRoute>
             }
           />
