@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import toast from 'react-hot-toast';
 import axios from 'axios';
+import { useAuthStore } from '@/store/authStore';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useAuthStore();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -31,6 +33,7 @@ export default function Login() {
       const res = await axios.post('/api/login', { email, password });
       const token = res.data.token;
       localStorage.setItem('token', token);
+      login(res.data.token);
 
       // 사용자 정보 가져와서 역할에 따라 라우팅
       const me = await axios.get('/api/me', {
@@ -38,7 +41,6 @@ export default function Login() {
       });
 
       const role = me.data.role.trim().toLowerCase();
-      console.log('role:', role);
 
       setTimeout(() => {
         navigate(`/${role}/dashboard`);

@@ -1,10 +1,12 @@
-import type { User } from "@/types/user";
+import { useAuthStore } from "@/store/authStore";
 
-export default function UserDashboard({ user }: User) {
+export default function UserDashboard() {
+  const { user } = useAuthStore();
   return (
     <div>
       <h1>사용자 대시보드</h1>
-      <p>환영합니다, {user.email} ({user.role})</p>
+      <h2>👤 {user?.email}</h2>
+      <p>권한: {user?.role}</p>
     </div>
   );
 }
