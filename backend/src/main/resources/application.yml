@@ -65,5 +65,8 @@ onbid:
   api:
     service-key: ${ONBID_SERVICE_KEY}
 
+jwt:
+  secret: onbidhub-secret-onbidhub-secret-onbidhub-secret!
+
 #env:
 #  ONBID_SERVICE_KEY: ${{ secrets.ONBID_SERVICE_KEY }}

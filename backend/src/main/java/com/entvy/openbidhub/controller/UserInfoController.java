@@ -1,5 +1,6 @@
 package com.entvy.openbidhub.controller;
 
+import com.entvy.openbidhub.dto.UserInfoResponse;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,9 +36,6 @@ public class UserInfoController {
         String email = claims.getSubject();
         String role = claims.get("role", String.class);
 
-        return ResponseEntity.ok(Map.of(
-                "email", email,
-                "role", role
-        ));
+        return ResponseEntity.ok(new UserInfoResponse(email, role));
     }
 }

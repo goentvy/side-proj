@@ -23,8 +23,8 @@ public class TestUserInserter implements CommandLineRunner {
     public void run(String... args) {
         List<User> testUsers = List.of(
                 createUser("admin@test.com", "ADMIN"),
-                createUser("user1@test.com", "USER"),
-                createUser("user2@test.com", "USER")
+                createUser("user@test.com", "USER"),
+                createUser("partner@test.com", "PARTNER")
         );
 
         for (User user : testUsers) {

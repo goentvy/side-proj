@@ -3,6 +3,7 @@ package com.entvy.openbidhub.service;
 import com.entvy.openbidhub.domain.AuctionItemEntity;
 import com.entvy.openbidhub.domain.OnbidRawItemEntity;
 import com.entvy.openbidhub.dto.AuctionCardDto;
+import com.entvy.openbidhub.dto.RegionBidSummary;
 import com.entvy.openbidhub.mapper.AuctionItemMapper;
 import com.entvy.openbidhub.mapper.OnbidRawItemMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -98,5 +100,18 @@ public class AuctionItemService {
             log.warn("날짜 파싱 실패: {}", raw);
             return null;
         }
+    }
+    // 지역별 입찰 수량 집계
+    public List<RegionBidSummary> getRegionBidSummary() {
+        return auctionItemMapper.getRegionBidSummary();
+    }
+    // 입찰 상태별 건수 집계
+    public Map<String, Long> getBidStatusSummary() {
+        List<Map<String, Object>> raw = auctionItemMapper.selectBidStatusSummary();
+        return raw.stream()
+                .collect(Collectors.toMap(
+                        m -> (String) m.get("status"),
+                        m -> ((Number) m.get("count")).longValue()
+                ));
     }
 }

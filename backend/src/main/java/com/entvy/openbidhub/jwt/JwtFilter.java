@@ -1,6 +1,8 @@
 package com.entvy.openbidhub.jwt;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,29 +23,30 @@ public class JwtFilter extends OncePerRequestFilter {
     @Autowired
     private JwtUtil jwtUtil;
 
+    private static final List<String> WHITELIST = List.of(
+            "/api/login",
+            "/api/signup",
+            "/api/onbid",
+            "/api/raw-items",
+            "/api/raw-items/import",
+            "/api/auction-items/import",
+            "/swagger-ui",
+            "/v3/api-docs",
+            "/api-docs",
+            "/swagger-ui.html"
+    );
+
+    private boolean isWhitelisted(String path) {
+        return WHITELIST.stream().anyMatch(path::startsWith);
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
         String path = request.getRequestURI();
 
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        // 인증 없이 허용할 경로
-        if (path.startsWith("/api/login") ||
-            path.startsWith("/api/signup") ||
-            path.startsWith("/api/onbid") ||
-            path.startsWith("/api/raw-items") ||
-            path.startsWith("/api/raw-items/import") ||
-            path.startsWith("/api/auction-items") ||
-            path.startsWith("/api/auction-items/import") ||
-            path.startsWith("/swagger-ui") ||
-            path.startsWith("/v3/api-docs") ||
-            path.startsWith("/api-docs") ||
-            path.startsWith("/swagger-ui.html")) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod()) || isWhitelisted(path)) {
             chain.doFilter(request, response);
             return;
         }
@@ -57,15 +60,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                // 권한설정
-                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-                UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(email, null, authorities);
+                if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                    List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(email, null, authorities);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    request.setAttribute("claims", claims);
+                }
 
-                SecurityContextHolder.getContext().setAuthentication(auth);
-                request.setAttribute("claims", claims);
-
-            } catch (Exception e) {
+            } catch (ExpiredJwtException e) {
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Token expired");
+                return;
+            } catch (JwtException e) {
                 response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid token");
                 return;
             }

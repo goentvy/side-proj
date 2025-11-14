@@ -19,4 +19,37 @@
             )
         </foreach>
     </insert>
+    <!--  지역별 입찰 수량을 집계하는 API Mapper  -->
+    <select id="getRegionBidSummary" resultType="com.entvy.openbidhub.dto.RegionBidSummary">
+        SELECT
+            CASE
+                WHEN cltr_nm LIKE '%제주%' THEN '제주'
+                WHEN cltr_nm LIKE '%전북%' OR cltr_nm LIKE '%전라북도%' THEN '전북'
+                WHEN cltr_nm LIKE '%전남%' OR cltr_nm LIKE '%전라남도%' THEN '전남'
+                WHEN cltr_nm LIKE '%인천%' THEN '인천'
+                WHEN cltr_nm LIKE '%울산%' THEN '울산'
+                WHEN cltr_nm LIKE '%세종%' THEN '세종'
+                WHEN cltr_nm LIKE '%서울%' THEN '서울'
+                WHEN cltr_nm LIKE '%부산%' THEN '부산'
+                WHEN cltr_nm LIKE '%대전%' THEN '대전'
+                WHEN cltr_nm LIKE '%대구%' THEN '대구'
+                WHEN cltr_nm LIKE '%광주%' THEN '광주'
+                WHEN cltr_nm LIKE '%경북%' OR cltr_nm LIKE '%경상북도%' THEN '경북'
+                WHEN cltr_nm LIKE '%경남%' OR cltr_nm LIKE '%경상남도%' THEN '경남'
+                WHEN cltr_nm LIKE '%경기%' THEN '경기'
+                WHEN cltr_nm LIKE '%강원%' THEN '강원'
+                ELSE '기타'
+                END AS region,
+            COUNT(*) AS count
+        FROM auction_items
+        GROUP BY region
+        ORDER BY count DESC
+    </select>
+    <!-- 입찰 상태별 건수 집계 -->
+    <select id="selectBidStatusSummary" resultType="map">
+        SELECT pbct_cltr_stat_nm AS status, COUNT(*) AS count
+        FROM auction_items
+        WHERE pbct_cltr_stat_nm IN ('입찰준비중', '인터넷입찰진행중')
+        GROUP BY pbct_cltr_stat_nm
+    </select>
 </mapper>
