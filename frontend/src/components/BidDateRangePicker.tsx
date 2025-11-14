@@ -1,4 +1,3 @@
-import React from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -18,7 +17,7 @@ export default function BidDateRangePicker({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="flex flex-col">
-        <label className="text-sm font-medium text-gray-700 mb-1">입찰 시작일</label>
+        <label className="text-sm font-medium text-gray-500 mb-1">입찰 시작일</label>
         <DatePicker
           selected={pbctBegnDtmFrom}
           onChange={onChangeStart}
@@ -31,7 +30,7 @@ export default function BidDateRangePicker({
         />
       </div>
       <div className="flex flex-col">
-        <label className="text-sm font-medium text-gray-700 mb-1">입찰 종료일</label>
+        <label className="text-sm font-medium text-gray-500 mb-1">입찰 종료일</label>
         <DatePicker
           selected={pbctBegnDtmTo}
           onChange={onChangeEnd}

@@ -40,3 +40,12 @@ export {
   SelectTrigger,
   SelectValue,
 } from './select'
+
+export {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  ChartLegend,
+  ChartLegendContent,
+  ChartStyle,
+} from './chart'

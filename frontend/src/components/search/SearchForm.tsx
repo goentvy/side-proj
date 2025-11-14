@@ -51,7 +51,6 @@ const SearchForm = ({ onSubmit, onShowAll }: Props) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("검색 조건: ", form);
     onSubmit(form);
   };
 

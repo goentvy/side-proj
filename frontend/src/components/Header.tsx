@@ -11,39 +11,20 @@ export default function Header() {
     navigate('/login');
   };
 
-    function getDashboardPath(role: string): string {
-        switch (role) {
-            case 'ADMIN':
-            return '/admin/dashboard';
-            case 'USER':
-            return '/user/dashboard';
-            case 'PARTNER':
-            return '/partner/dashboard';
-            default:
-            return '/unauthorized';
-        }
-    }
-
-  const goToDashboard = () => {
-    if (user) {
-        navigate(getDashboardPath(user.role));
-    }
-  }
-
   return (
     <header className="flex items-center justify-between px-6 py-4 bg-muted text-muted-foreground shadow-sm">
       <div className="flex items-center gap-4">
         <h1 className="text-xl font-bold cursor-pointer" onClick={() => navigate('/')}>
           🏛 OpenBidHub
         </h1>
-        <button onClick={() => navigate('/')} className="text-sm hover:underline">
-          조건 검색
-        </button>
         {user && (
-          <button onClick={goToDashboard} className="text-sm hover:underline">
+          <button onClick={() => navigate('/')} className="text-sm hover:underline">
             내 대시보드
           </button>
         )}
+        <button onClick={() => navigate('/search')} className="text-sm hover:underline">
+          조건 검색
+        </button>
       </div>
 
       <div className="flex items-center gap-4">
