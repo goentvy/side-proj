@@ -1,7 +1,7 @@
-import { useAuth } from '@/hook/useAuth';
+import { useAuthStore } from '@/store/authStore';
 
 export default function ProfilePage() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isLoading, isAuthenticated } = useAuthStore();
 
   if (isLoading) return <p>로딩 중...</p>;
   if (!isAuthenticated || !user) return <p>로그인이 필요합니다.</p>;

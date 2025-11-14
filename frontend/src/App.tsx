@@ -11,12 +11,12 @@ import Login from './pages/Login'
 import NotFound from './pages/NotFound'
 
 // 대시보드
-import UserDashboard from './pages/user/UserDashboard'
-import AdminDashboard from './pages/admin/AdminDashboard'
-import PartnerDashboard from './pages/partner/PartnerDashboard'
 import UnauthorizedPage from './pages/UnauthorizedPage'
-import SearchPage from './pages/search/SearchPage'
 import Header from './components/Header'
+import DashboardPage from './pages/dashboard/DashboardPage'
+import SearchFormPage from './pages/search/SearchFormPage'
+import SearchResultsPage from './pages/search/SearchResultsPage'
+import Footer from './components/Footer'
 
 function App() {
 
@@ -32,37 +32,35 @@ function App() {
 
         <Routes>
           {/* 공통 */}
-          <Route path="/" element={<SearchPage />} />
+          <Route 
+            path="/" 
+            element={
+              <SecureRoute>
+                <DashboardPage />
+              </SecureRoute>
+            }
+          />
+          <Route 
+            path="/search" 
+            element={
+              <SecureRoute>
+                <SearchFormPage />
+              </SecureRoute>
+            }
+          />
+          <Route 
+            path="/search/results" 
+            element={
+              <SecureRoute>
+                <SearchResultsPage />
+              </SecureRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
           <Route path="*" element={<NotFound />} />
-
-          {/* 대시보드 */}
-          <Route 
-            path="/user/dashboard" 
-            element={
-              <SecureRoute allowedRoles={['USER']}>
-                <UserDashboard />
-              </SecureRoute>
-            }
-          />
-          <Route 
-            path="/admin/dashboard" 
-            element={
-              <SecureRoute allowedRoles={['ADMIN']}>
-                <AdminDashboard />
-              </SecureRoute>
-            }
-          />
-          <Route 
-            path="/partner/dashboard" 
-            element={
-              <SecureRoute allowedRoles={['PARTNER']}>
-                <PartnerDashboard />
-              </SecureRoute>
-            }
-          />
         </Routes>
+        <Footer />
       </div>
     </ThemeProvider>
   )

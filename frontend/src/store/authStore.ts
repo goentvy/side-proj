@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import axios from "axios";
+import axios from "@/lib/axios";
 import toast from "react-hot-toast";
 
 export interface UserInfo {
@@ -9,11 +9,14 @@ export interface UserInfo {
 }
 
 interface AuthState {
-    user: UserInfo | null;
-    isLoading: boolean;
-    login: (token: string) => void;
-    logout: () => void;
-    fetchUser: () => void;
+  user: UserInfo | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  error: string | null;
+  loadingMessage: string | null;
+  login: (token: string) => void;
+  logout: () => void;
+  fetchUser: () => void;
 }
 
 export const useAuthStore = create(
@@ -21,31 +24,47 @@ export const useAuthStore = create(
         (set) => ({
             user: null,
             isLoading: true,
+            isAuthenticated: false,
+            error: null,
+            loadingMessage: "사용자 정보 불러오는 중...",
 
             fetchUser: async () => {
-                set({ isLoading: true });
+                set({ isLoading: true, loadingMessage: "사용자 정보 불러오는 중..." });
                 const token = localStorage.getItem("token");
                 if (!token) {
-                    set({ user: null, isLoading: false });
+                    set({ 
+                        user: null,
+                        isLoading: false,
+                        isAuthenticated: false,
+                        error: "토큰 없음",
+                        loadingMessage: null,
+                    });
                     return;
                 }
 
                 try {
-                    const res = await axios.get("/api/me", {
-                        headers: { Authorization: `Bearer ${token}` },
-                    });
+                    const res = await axios.get("/api/me");
                     set({
                         user: {
                             email: res.data.email,
                             role: res.data.role.trim().toUpperCase(),
                         },
                         isLoading: false,
+                        isAuthenticated: true,
+                        error: null,
+                        loadingMessage: null,
                     });
                 } catch (err) {
                     toast.error("세션이 만료되었습니다.");
                     console.error(err);
                     localStorage.removeItem("token");
-                    set({ user: null, isLoading: false });
+                    set({ 
+                        user: null,
+                        isLoading: false,
+                        isAuthenticated: false,
+                        error: "세션이 만료되었습니다.",
+                        loadingMessage: null,    
+                    });
                 }
             },
 
@@ -57,7 +76,13 @@ export const useAuthStore = create(
 
             logout: () => {
                 localStorage.removeItem("token");
-                set({ user: null, isLoading: false });
+                set({
+                    user: null,
+                    isLoading: false,
+                    isAuthenticated: false,
+                    error: null,
+                    loadingMessage: null,
+                });
             },
         }),
         {
