@@ -3,6 +3,8 @@ package com.entvy.openbidhub.jwt;
 import com.entvy.openbidhub.domain.User;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -11,15 +13,32 @@ import java.util.Date;
 
 @Component
 public class JwtUtil {
-    private final String SECRET_KEY = "onbidhub-secret-onbidhub-secret-onbidhub-secret!";
-    private final Key key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes(StandardCharsets.UTF_8));
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    private Key key;
+
+    private final long EXPIRATION_MS = 86400000; // 1일
+
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+    }
 
     public String generateToken(User user) {
+        return generateToken(user.getEmail(), user.getRole(), EXPIRATION_MS);
+    }
+
+    public String generateToken(String subject, String role, long expirationMillis) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + expirationMillis);
+
         return Jwts.builder()
-                .setSubject(user.getEmail())
-                .claim("role", user.getRole())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + 86400000)) // 1일
+                .setSubject(subject)
+                .claim("role", role)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -32,10 +51,9 @@ public class JwtUtil {
                     .parseClaimsJws(token)
                     .getBody();
         } catch (ExpiredJwtException e) {
-            throw new RuntimeException("Token expired");
+            throw new JwtValidationException("Token expired", e);
         } catch (JwtException e) {
-            throw new RuntimeException("Invalid token");
+            throw new JwtValidationException("Invalid token", e);
         }
-
     }
 }
