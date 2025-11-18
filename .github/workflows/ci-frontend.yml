@@ -1,8 +1,8 @@
-name: CI (frontend-work)
+name: CI (frontend)
 
 on:
   push:
-    branches: [frontend-work]
+    branches: [frontend]
 
 jobs:
   build-frontend:
