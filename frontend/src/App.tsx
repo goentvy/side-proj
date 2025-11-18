@@ -9,14 +9,21 @@ import { useAuthStore } from './store/authStore'
 // 페이지 컴포넌트
 import Login from './pages/Login'
 import NotFound from './pages/NotFound'
+import UnauthorizedPage from './pages/UnauthorizedPage'
+
+// 공용 레이아웃
+import Header from './components/Header'
+import Footer from './components/Footer'
 
 // 대시보드
-import UnauthorizedPage from './pages/UnauthorizedPage'
-import Header from './components/Header'
 import DashboardPage from './pages/dashboard/DashboardPage'
+
+// 검색 페이지
 import SearchFormPage from './pages/search/SearchFormPage'
 import SearchResultsPage from './pages/search/SearchResultsPage'
-import Footer from './components/Footer'
+
+// 상세보기 페이지
+import ItemDetailPage from './pages/item/ItemDetailPage'
 
 function App() {
 
@@ -53,6 +60,14 @@ function App() {
             element={
               <SecureRoute>
                 <SearchResultsPage />
+              </SecureRoute>
+            }
+          />
+          <Route 
+            path="/item/:cltrMnmtNo" 
+            element={
+              <SecureRoute>
+                <ItemDetailPage />
               </SecureRoute>
             }
           />

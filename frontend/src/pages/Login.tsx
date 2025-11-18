@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Card, CardContent, CardHeader, CardTitle } from '@/components/ui';
 import toast from 'react-hot-toast';
@@ -11,19 +11,6 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const { login } = useAuthStore();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if(token) {
-      axios.get('/api/me')
-      .then(res => {
-        const role = res.data.role.trim().toLowerCase();
-        navigate(`/${role}/dashboard`);
-      }).catch(() => {
-        localStorage.removeItem('token');
-      });
-    }
-  }, [navigate]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -32,11 +19,7 @@ export default function Login() {
       localStorage.setItem('token', token);
       login(res.data.token);
 
-      // 사용자 정보 가져와서 역할에 따라 라우팅
-      const me = await axios.get('/api/me');
-
-      const role = me.data.role.trim().toLowerCase();
-      navigate(`/${role}/dashboard`);
+      navigate('/');
     } catch (err) {
       toast.error('로그인 실패');
       console.error("로그인 실패: " + err);

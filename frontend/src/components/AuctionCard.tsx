@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui";
 import type { OnbidItemResponse } from "@/types";
+import { useNavigate } from "react-router-dom";
 
 function formatCurrency(value: number | null | undefined) {
   if (value == null) return "-";
@@ -16,8 +17,13 @@ const AuctionCard = ({
   pbctClsDtm,
   pbctCltrStatNm,
 }: OnbidItemResponse) => {
+  const navigate = useNavigate();
+
   return (
-    <Card className="mb-4 shadow-sm">
+    <Card
+      className="mb-4 shadow-sm cursor-pointer hover:shadow-md transition"
+      onClick={() => navigate(`/item/${cltrMnmtNo}`)}
+    >
       <CardHeader>
         <CardTitle className="text-lg font-semibold">{cltrNm}</CardTitle>
         <Badge variant={pbctCltrStatNm === "입찰중" ? "default" : "secondary"}>
