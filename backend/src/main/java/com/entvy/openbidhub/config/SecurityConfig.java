@@ -28,6 +28,7 @@ public class SecurityConfig {
                     .requestMatchers("/api/auth/**", "/swagger-ui/**", "/v3/api-docs/**", "/api-docs/**", "/swagger-ui.html").permitAll()
                     .requestMatchers("/api/login", "/api/signup", "/api/onbid/**", "/api/onbid/cards","/api/auction-items/import", "/api/raw-items/import").permitAll()
                     .requestMatchers("/api/me", "/api/auction-items", "/api/auction-items/**").authenticated()
+                    .requestMatchers("/api/items/**").permitAll()
                     .requestMatchers("/api/user/**").hasAnyRole("USER", "ADMIN")
                     .requestMatchers("/api/admin/**").hasAuthority("ADMIN")
                     .anyRequest().authenticated()
