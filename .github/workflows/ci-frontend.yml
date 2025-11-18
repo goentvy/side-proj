@@ -3,6 +3,12 @@ name: CI (frontend)
 on:
   push:
     branches: [frontend]
+  pull_request:
+    branches: [frontend]
+
+permissions:
+  issues: write
+  contents: read
 
 jobs:
   build-frontend:
@@ -37,12 +43,10 @@ jobs:
         run: |
           STATUS="✅ 빌드 성공"
           FAILURES=""
-          
           if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
             FAILURES="${FAILURES}❌ Frontend 빌드 실패\n"
             STATUS="❌ 빌드 실패\n${FAILURES}"
           fi
-          
           echo "status=$STATUS" >> $GITHUB_OUTPUT
 
       - name: Send Slack notification
@@ -50,7 +54,7 @@ jobs:
         with:
           payload: |
             {
-              "text": "*🔔 CI 알림*\n\n*브랜치:* `${{ github.ref_name }}`\n*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n*상태:* `${{ steps.set-status.outputs.status }}`\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+              "text": "*🔔 Frontend CI 알림*\n\n*브랜치:* `${{ github.ref_name }}`\n*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n*상태:* `${{ steps.set-status.outputs.status }}`\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
               "username": "GitHub Actions",
               "icon_emoji": ":robot_face:"
             }
@@ -67,20 +71,15 @@ jobs:
         run: sudo apt install gh
 
       - name: Authenticate GitHub CLI
-        run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Determine failed jobs
-        id: set-failure
-        run: |
-          FAILURES=""
-          if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
-            FAILURES="${FAILURES}- ❌ Frontend 빌드 실패\n"
-          fi
-          echo "failures=$FAILURES" >> $GITHUB_OUTPUT
+        run: gh auth status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create GitHub Issue
         run: |
           gh issue create \
-            --title "❌ CI 실패: `${{ github.ref_name }}` 브랜치" \
-            --body "*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n\n*실패 항목:*\n${{ steps.set-failure.outputs.failures }}\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
+            --title "❌ Frontend CI 실패: `${{ github.ref_name }}` 브랜치" \
+            --body "*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n\n❌ Frontend 빌드 실패\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
             --label "ci-failure"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
