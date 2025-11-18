@@ -1,33 +1,10 @@
-name: CI
+name: CI (backend-work)
 
 on:
   push:
-    branches: [dev, frontend, backend]
-  pull_request:
-    branches: [dev]
+    branches: [backend-work]
 
 jobs:
-  build-frontend:
-    name: Build Frontend
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22.12.0
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Vite project
-        run: npm run build
-
   build-backend:
     name: Build Backend
     runs-on: ubuntu-latest
@@ -54,7 +31,7 @@ jobs:
     name: Notify Slack
     runs-on: ubuntu-latest
     if: always()
-    needs: [build-frontend, build-backend]
+    needs: [build-backend]
     steps:
       - name: Set CI status
         id: set-status
@@ -62,16 +39,9 @@ jobs:
           STATUS="✅ 빌드 성공"
           FAILURES=""
           
-          if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
-            FAILURES="${FAILURES}❌ Frontend 빌드 실패\n"
-          fi
-          
           if [[ "${{ needs.build-backend.result }}" != "success" ]]; then
             FAILURES="${FAILURES}❌ Backend 빌드 실패\n"
-          fi
-          
-          if [[ "$FAILURES" != "" ]]; then
-            STATUS="⚠️ 일부 실패\n${FAILURES}"
+            STATUS="❌ 빌드 실패\n${FAILURES}"
           fi
           
           echo "status=$STATUS" >> $GITHUB_OUTPUT
@@ -87,12 +57,12 @@ jobs:
             }
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  
+
   create-issue-on-failure:
     name: Create Issue on Failure
     runs-on: ubuntu-latest
     if: failure()
-    needs: [build-frontend, build-backend]
+    needs: [build-backend]
     steps:
       - name: Install GitHub CLI
         run: sudo apt install gh
@@ -104,9 +74,6 @@ jobs:
         id: set-failure
         run: |
           FAILURES=""
-          if [[ "${{ needs.build-frontend.result }}" != "success" ]]; then
-            FAILURES="${FAILURES}- ❌ Frontend 빌드 실패\n"
-          fi
           if [[ "${{ needs.build-backend.result }}" != "success" ]]; then
             FAILURES="${FAILURES}- ❌ Backend 빌드 실패\n"
           fi
