@@ -15,13 +15,13 @@ export function SummaryCards({ role }: { role?: string }) {
   const cards = [
     { title: '입찰준비중', value: data?.["입찰준비중"] ?? 0 },
     { title: '인터넷입찰진행중', value: data?.["인터넷입찰진행중"] ?? 0 },
-    { title: '알림', value: 5 },
+    ...(role === "admin" ? [{ title: '알림', value: 5 }] : []),
   ];
 
   const navigate = useNavigate();
 
   const handleCardClick = (status: string) => {
-    if(status === "알림") return;
+    if(status === "알림" && role !== "admin") return;
     navigate(`/search/results?pbctCltrStatNm=${encodeURIComponent(status)}`);
   };
 
@@ -30,7 +30,8 @@ export function SummaryCards({ role }: { role?: string }) {
       {cards.map((card) => (
         <div
           key={card.title}
-          className="bg-white hover:bg-gray-100 cursor-pointer p-4 rounded-lg shadow transition-all duration-200 border border-gray-200"
+          className={`bg-white hover:bg-gray-100 cursor-pointer p-4 rounded-lg shadow transition-all duration-200 border
+            ${role === "admin" ? "border-blue-400" : "border-gray-200"}`}
           onClick={() => handleCardClick(card.title)}
         >
           <div className="text-sm text-gray-500">{card.title}</div>

@@ -125,7 +125,7 @@ export function RegionBidChart() {
               content={<ChartTooltipContent indicator="line" />}
             />
             <Bar dataKey="count" layout="vertical" radius={4}>
-              {chartData.map((entry, index) => (
+              {chartData.map((_, index) => (
                 <Cell key={`cell-${index}`} fill={regionColors[index % regionColors.length]} />
               ))}
               <LabelList
