@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [dev]
 
+permissions:
+  issues: write
+  contents: read
+
 jobs:
   build-frontend:
     name: Build Frontend
@@ -98,7 +102,9 @@ jobs:
         run: sudo apt install gh
 
       - name: Authenticate GitHub CLI
-        run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
+        run: gh auth status
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Determine failed jobs
         id: set-failure
@@ -118,3 +124,5 @@ jobs:
             --title "❌ CI 실패: `${{ github.ref_name }}` 브랜치" \
             --body "*작성자:* `${{ github.actor }}`\n*커밋 메시지:* `${{ github.event.head_commit.message }}`\n\n*실패 항목:*\n${{ steps.set-failure.outputs.failures }}\n\n🔗 [실행 로그 보기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})" \
             --label "ci-failure"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
