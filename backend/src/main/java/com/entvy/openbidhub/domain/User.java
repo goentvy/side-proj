@@ -27,8 +27,4 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private boolean active = true;
-
-    // 추가 예정 필드
-//    private String name;
-//    private String phone;
 }

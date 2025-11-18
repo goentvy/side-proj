@@ -30,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/raw-items",
             "/api/raw-items/import",
             "/api/auction-items/import",
+            "/api/items",
             "/swagger-ui",
             "/v3/api-docs",
             "/api-docs",

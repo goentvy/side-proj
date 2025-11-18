@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.entvy.openbidhub.mapper.OnbidItemMapper">
+
+    <resultMap id="ItemDetailResultMap" type="com.entvy.openbidhub.dto.ItemDetailDto">
+        <result property="cltrNm" column="cltr_nm"/>
+        <result property="ldnmAdrs" column="ldnm_adrs"/>
+        <result property="nmrdAdrs" column="nmrd_adrs"/>
+        <result property="cltrMnmtNo" column="cltr_mnmt_no"/>
+        <result property="ctgrFullNm" column="ctgr_full_nm"/>
+        <result property="scrtNm" column="scrt_nm"/>
+        <result property="pbctNo" column="pbct_no"/>
+        <result property="pbctCdtnNo" column="pbct_cdtn_no"/>
+        <result property="cltrNo" column="cltr_no"/>
+        <result property="cltrHstrNo" column="cltr_hstr_no"/>
+        <result property="minBidPrc" column="min_bid_prc"/>
+        <result property="apslAsesAvgAmt" column="apsl_ases_avg_amt"/>
+        <result property="feeRate" column="fee_rate"/>
+        <result property="pbctBegnDtm" column="pbct_begn_dtm"/>
+        <result property="pbctClsDtm" column="pbct_cls_dtm"/>
+        <result property="pbctCltrStatNm" column="pbct_cltr_stat_nm"/>
+        <result property="uscbCnt" column="uscb_cnt"/>
+        <result property="iqryCnt" column="iqry_cnt"/>
+        <result property="goodsNm" column="goods_nm"/>
+        <result property="tpbz" column="tpbz"/>
+        <result property="mmbRgtNm" column="mmb_rgt_nm"/>
+        <result property="cltrImgFiles" column="cltr_img_files"/>
+    </resultMap>
+
+    <!-- 최신 시작일 기준으로 정렬 및 최신 한건만 반환 -->
+    <select id="selectItemDetail" resultMap="ItemDetailResultMap">
+        SELECT *
+        FROM onbid_raw_items
+        WHERE cltr_mnmt_no = #{cltrMnmtNo}
+        ORDER BY pbct_begn_dtm DESC
+        LIMIT 1
+    </select>
+
+</mapper>
