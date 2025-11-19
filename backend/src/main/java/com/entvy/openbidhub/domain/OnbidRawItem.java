@@ -39,6 +39,7 @@ public class OnbidRawItem {
     private Integer uscbCnt;
     private Integer iqryCnt;
 
+    @Column(columnDefinition = "TEXT")
     private String goodsNm;
     private String tpbz;
     private String mmbRgtNm;
