@@ -3,6 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 
 export function SummaryCards({ role }: { role?: string }) {
+  const navigate = useNavigate();
+  console.log(role);
 
   const { data } = useQuery({
     queryKey: ["bidStatusSummary"],
@@ -15,13 +17,12 @@ export function SummaryCards({ role }: { role?: string }) {
   const cards = [
     { title: '입찰준비중', value: data?.["입찰준비중"] ?? 0 },
     { title: '인터넷입찰진행중', value: data?.["인터넷입찰진행중"] ?? 0 },
-    ...(role === "admin" ? [{ title: '알림', value: 5 }] : []),
+    ...(role === "ADMIN" ? [{ title: '알림', value: 5 }] : []),
   ];
 
-  const navigate = useNavigate();
 
   const handleCardClick = (status: string) => {
-    if(status === "알림" && role !== "admin") return;
+    if(status === "알림" && role !== "ADMIN") return;
     navigate(`/search/results?pbctCltrStatNm=${encodeURIComponent(status)}`);
   };
 
@@ -31,7 +32,7 @@ export function SummaryCards({ role }: { role?: string }) {
         <div
           key={card.title}
           className={`bg-white hover:bg-gray-100 cursor-pointer p-4 rounded-lg shadow transition-all duration-200 border
-            ${role === "admin" ? "border-blue-400" : "border-gray-200"}`}
+            ${role === "ADMIN" ? "border-blue-400" : "border-gray-200"}`}
           onClick={() => handleCardClick(card.title)}
         >
           <div className="text-sm text-gray-500">{card.title}</div>

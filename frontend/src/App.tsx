@@ -33,7 +33,7 @@ function App() {
 
   return (
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
-      <Toaster position="top-center" />
+      <Toaster position="top-right" />
       <div className="bg-background text-foreground min-h-screen">
         <Header />
 
